@@ -1,0 +1,15 @@
+POST http://localhost:3000/users/
+{
+	"username": "Testuser",
+    "email": "test@email.com",
+    "password": "123456",
+    "created_groups": [],
+    "joined_groups": [],
+    "stories": [],
+    "profile": {
+        "profile_pic": "",
+        "dob": "",
+        "first_name": "",
+        "last_name": ""
+    }
+}
