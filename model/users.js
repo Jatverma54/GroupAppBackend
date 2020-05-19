@@ -4,9 +4,9 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var UserModelSchema = new Schema({
-    username: String,
-    email: String,
-    password: String,
+    username: { type: String, required: true },
+    email: { type: String, required: true },
+    password: { type: String, required: true },
     created_groups: [Schema.Types.ObjectId],
     joined_groups: [Schema.Types.ObjectId],
     stories: [Object],
