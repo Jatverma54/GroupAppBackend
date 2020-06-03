@@ -16,4 +16,16 @@ router.post('/', function(req, res){
     });
 });
 
+router.get('/', function(req, res){
+    console.log("****User data");
+    userObj.getData(req,res);
+});
+
+router.delete('/:id', function(req, res){
+    console.log("****req.body.password", req.body.password);
+    userObj.deleteData(req,res);
+});
+
+
+
 module.exports = router;

@@ -12,9 +12,9 @@ var UserModelSchema = new Schema({
     stories: [Object],
     profile: {
         profile_pic: String,
-        dob: Date,
-        first_name: String,
-        last_name: String
+        dob:{ type: Date, required: true },
+        full_name: { type: String, required: true },
+       
     }
 });
 

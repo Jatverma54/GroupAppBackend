@@ -14,3 +14,31 @@ exports.addUser = function(req, res, next){
         // saved!
     })
 }
+
+
+exports.getData = async (req, res)=>{
+   try{
+    const UserData = await UserModel.find();
+    res.json({message: "Data: ", result: UserData});
+   }catch(err){
+    res.json({message: err});
+   }
+}
+
+exports.getData = async (req, res)=>{
+    try{
+     const UserData = await UserModel.find();
+     res.json({message: "Data: ", result: UserData});
+    }catch(err){
+     res.json({message: err});
+    }
+ }
+
+ exports.deleteData = async (req, res)=>{
+   try{
+    const RemovedData = await UserModel.remove({_id: req.params.id});
+    res.json({message: "Removed User: ", result: RemovedData});
+   }catch(err){
+    res.json({message: err});
+   }
+}
