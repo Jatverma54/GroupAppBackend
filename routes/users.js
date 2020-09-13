@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const bcrypt = require('bcrypt');
-
+const auth = require('../middleware/auth')
 var userObj = require('./../services/users');
 const CONSTANT = require('./../common/constant');
 
@@ -25,6 +25,28 @@ router.delete('/:id', function(req, res){
     console.log("****req.body.password", req.body.password);
     userObj.deleteData(req,res);
 });
+
+
+router.post('/login', async (req, res) => {
+  
+      
+        userObj.loginUser(req, res)
+       
+  
+})
+
+router.post('/logout', auth, async (req, res) => {
+    try {
+        req.user.tokens = req.user.tokens.filter((token) => {
+            return token.token !== req.token
+        })
+        await req.user.save()
+
+        res.send()
+    } catch (e) {
+        res.status(500).send()
+    }
+})
 
 
 
