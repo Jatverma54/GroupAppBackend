@@ -7,6 +7,7 @@ const cors = require('cors');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const adminRouter = require('./routes/admin');
+const groupRouter = require('./routes/groups');
 const bodyParser =require('body-parser');
 const connection = require('./common/connection');
 
@@ -25,6 +26,7 @@ app.use(bodyParser.json());
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/admin', adminRouter);
+app.use('/groups', groupRouter);
 
 
 

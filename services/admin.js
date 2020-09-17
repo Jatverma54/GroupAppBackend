@@ -1,16 +1,17 @@
 var CategoryModel = require('./../model/categories');
-const auth = require('../middleware/auth')
+const auth = require('../middleware/auth');
+
 //var UserModel = require('./../model/users');
 
 exports.addCategories = function(req, res, next){
  
-
+try{
     if(req.user.profile.role==="Admin"){
 
    
-    var CategoryData = new CategoryModel(req.body);
+    //var CategoryData = new CategoryModel(req.body);
  
-    CategoryData.save(async (err, result)=> {
+    CategoryModel.insertMany(req.body ,async (err, result)=> {
         console.log("*****err", err);
         if (err) {
 
@@ -27,9 +28,33 @@ exports.addCategories = function(req, res, next){
             console.log(result,"Resultttttttttt")
         }
        console.log();
-   })         
+  })         
 }else{
     res.status(400).send("User is not an Admin");
           
 }
+}catch(e){
+    res.status(400).send({error:e});
 }
+}
+
+
+exports.getCategories = async (req, res)=>{
+    try{
+    
+     const CategoryData = await CategoryModel.find();
+     res.status(200).json({message: "Data: ", result: CategoryData});
+    }catch(err){
+     res.status(400).json({error: err});
+    }
+ }
+
+ exports.deleteData = async (req, res)=>{
+    try{
+     const RemovedData = await CategoryModel.remove({_id: req.params.id});
+     res.status(200).json({message: "Removed User: ", result: RemovedData});
+    }catch(err){
+        res.status(400).json({message: err});
+    }
+ }
+ 

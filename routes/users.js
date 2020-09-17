@@ -23,8 +23,12 @@ router.get('/', function(req, res){
 
 router.delete('/:id', function(req, res){
     console.log("****req.body.password", req.body.password);
-    userObj.deleteData(req,res);
+    
 });
+
+router.delete('/me', auth, async (req, res) => {
+   userObj.deleteData(req,res);
+})
 
 
 router.post('/login', async (req, res) => {

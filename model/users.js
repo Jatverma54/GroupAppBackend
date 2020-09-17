@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt')
-
+var uniqueValidator = require('mongoose-unique-validator');
 //Define a schema
 var Schema = mongoose.Schema;
 
@@ -14,9 +14,10 @@ var UserModelSchema = new mongoose.Schema({
     stories: [Object],
     profile: {
         profile_pic: String,
-        dob:{ type: Date, required: true },
+        dob:{ type: Date, required: true,trim: true },
         full_name: { type: String, required: true,  trim: true },
-        role: { type: String, required: true,  trim: true, default:"User" }
+        role: { type: String, required: true,  trim: true, default:"User" },
+        UserCreateddate: { type: Date,  default: Date.now() }
     },
     tokens: [{
         token: {
@@ -62,6 +63,8 @@ UserModelSchema.statics.findByCredentials = async (username, password) => {
 
     return user
 }
+
+UserModelSchema.plugin(uniqueValidator);
 
 const User = mongoose.model('UserModel', UserModelSchema)
 
