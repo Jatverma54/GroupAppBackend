@@ -9,9 +9,37 @@ var UserModelSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true, trim: true, },
     email: { type: String, required: true, unique: true, trim: true,lowercase: true, },
     password: { type: String, required: true,  trim: true, },
-    created_groups: [Schema.Types.ObjectId],
-    joined_groups: [Schema.Types.ObjectId],
-    stories: [Object],
+    created_groups: [{
+        groupid: {
+            type: Schema.Types.ObjectId,         
+        },
+        name:{
+            type: String,
+        }
+    }],
+    joined_groups: [{
+        groupid: {
+            type: Schema.Types.ObjectId,         
+        },
+        name:{
+            type: String,
+        },
+        GroupCategoryid: { type:Schema.Types.ObjectId,required:true},
+
+    }],
+    Requested_groups: [{
+        groupid: {
+            type: Schema.Types.ObjectId,         
+        },
+        name:{
+            type: String,
+        },
+      requestMessage:  {
+        type: String,
+        }
+    }],
+    admin_id: [{type:Schema.Types.ObjectId,}],
+   
     profile: {
         profile_pic: String,
         dob:{ type: Date, required: true,trim: true },
@@ -37,6 +65,11 @@ UserModelSchema.methods.generateAuthToken = async function () {
     return token
 }
 
+UserModelSchema.virtual('groupModels', {
+    ref: 'groupModel',
+    localField: '_id',
+    foreignField: 'owner_id'
+})
 
 UserModelSchema.methods.toJSON = function () {
     const user = this
@@ -44,6 +77,9 @@ UserModelSchema.methods.toJSON = function () {
 
     delete userObject.password
     delete userObject.tokens
+    delete userObject.created_groups
+    delete userObject.joined_groups
+    delete userObject.Requested_groups
 
     return userObject
 }

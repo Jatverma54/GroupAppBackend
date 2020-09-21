@@ -33,4 +33,27 @@ router.delete('/:id', auth,function(req, res){
 });
 
 
+router.post('/ViewGroupMembers', auth,function(req, res){
+    console.log("****req.body.password", req.body);
+    groupsObj.viewGroupMembers(req,res);
+});
+
+
+router.post('/SendJoinRequest', auth,function(req, res){
+    console.log("****req.body.password", req.body);
+    groupsObj.SendJoinRequest(req,res);
+});
+
+
+router.post('/DeleteSentJoinRequest', auth,function(req, res){
+    console.log("****req.body.password", req.body);
+    groupsObj.DeleteSentJoinRequest(req,res);
+});
+
+
+router.get('/getJoinedPublicGroups', auth,function(req, res){
+    console.log("****req.body.password", req.body);
+    groupsObj.getJoinedPublicGroups(req,res);
+});
+
 module.exports = router;

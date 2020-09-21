@@ -9,18 +9,19 @@ var groupModelSchema = new Schema({
     group_Bio:{ type: String, trim: true,},
     group_type: { type: String, required: true,  trim: true, },
     GroupCategory:{ type: String,   trim: true,},
-    groupMembers:[{type:Schema.Types.ObjectId,required:true}],
+    //groupMembers:[{type:Schema.Types.ObjectId,required:true}],
     GroupCategory_id: { type:Schema.Types.ObjectId,required:true},
     privacy: { type: String,   trim: true, default:"open"},
-    created_by: {type:Schema.Types.ObjectId,required:true,},
-    admin: [{type:Schema.Types.ObjectId,required:true}],
+    owner_id: {type:Schema.Types.ObjectId,required:true, ref: 'UserModel'},
+    admin_id: [{type:Schema.Types.ObjectId,required:true}],
     image: { type: String,default:null},
     groupCreateddate: { type: Date,  default: Date.now() },
     post:[Object],
-   // isJoined:{ type: Boolean,required:true},
-    RequestedBy: [{type:Schema.Types.ObjectId}],
-   // isRequested:{ type: String}
-   countMembers:{type:Schema.Types.Number,},
+    GroupAdminName:[{type: String}], 
+    isJoined:{ type: Boolean},
+   // RequestedBy: [{type:Schema.Types.ObjectId}],
+   isRequested:{ type: Boolean},
+  countMembers:{type:Number},
 });
 
 
