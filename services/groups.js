@@ -67,14 +67,27 @@ exports.getPublicGroups = async (req, res)=>{
       
      var groupData = await groupModel.find({ group_type:"public",GroupCategory_id: req.body.GroupCategory_id});
    
-     const userData = await UserModel.find();
-     groupData = groupData.map( item => {
-       item.isRequested =  req.user.Requested_groups.find(a=>a.groupid.toString()===item._id.toString())?true:false;
-       item.isJoined =  req.user.joined_groups.find(a=>a.groupid.toString()===item._id.toString())?true:false;  
-        let filteredArray = userData.filter((element) => element.joined_groups.some((groupid) => groupid.groupid.toString() === item._id.toString()));
-         item.countMembers=filteredArray.length;
-       return item;    
-            });
+  //   const userData = await UserModel.find();
+
+    // const userData = await UserModel.aggregate([
+    //     { "$match": { "joined_groups.groupid": item._id } },
+        
+    //     { "$match": { "joined_groups.name": item.GroupName } }]);;
+
+for(var data in groupData ){
+    groupData[data].isRequested =  req.user.Requested_groups.find(a=>a.groupid.toString()===groupData[data]._id.toString())?true:false;
+    groupData[data].isJoined =  req.user.joined_groups.find(a=>a.groupid.toString()===groupData[data]._id.toString())?true:false;  
+    groupData[data].countMembers = await UserModel.countDocuments({ "joined_groups.groupid": groupData[data]._id,"joined_groups.name": groupData[data].GroupName  } );
+  
+}
+     
+    //  groupData = groupData.map(  item => {
+    //    item.isRequested =  req.user.Requested_groups.find(a=>a.groupid.toString()===item._id.toString())?true:false;
+    //    item.isJoined =  req.user.joined_groups.find(a=>a.groupid.toString()===item._id.toString())?true:false;  
+    //     // let filteredArray = userData.filter((element) => element.joined_groups.some((groupid) => groupid.groupid.toString() === item._id.toString()));
+    //     //  item.countMembers=filteredArray.length;
+    //    return item;    
+    //         });
 
           
            
@@ -101,18 +114,23 @@ exports.getPublicGroups = async (req, res)=>{
  
     const groupData = await groupModel.findOne({ _id: req.body.groupid });
    
-     const userData = await UserModel.find();
+    const filteredArray = await UserModel.find({"joined_groups.groupid": groupData._id ,"joined_groups.name": groupData.GroupName });
    
-    
-    let filteredArray = userData.filter((element) => element.joined_groups.some((groupid) => groupid.groupid.toString() === req.body.groupid.toString()));
-  
+
+    // const filteredArray = await UserModel.aggregate([
+    //     { "$match": { "joined_groups.groupid": groupData._id } },
+        
+    //     { "$match": { "joined_groups.name": groupData.GroupName } }]);
+
+         //let filteredArray = userData.filter((element) => element.joined_groups.some((groupid) => groupid.groupid.toString() === req.body.groupid.toString()));
+
     for(var data in filteredArray){
       //  filteredArray[data].subElements = {"groupid": groupid};
   // console.log(groupData.admin_id,"ssss")
      filteredArray[data].admin_id=groupData.admin_id;//.(groupData.admin_id)
       }
-    console.log(filteredArray);
-   // console.log(ResponseJson)
+  
+//    console.log(filteredArray)
 
      res.status(200).json({message: "Group Members: ", result:filteredArray});
     }catch(err){

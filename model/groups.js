@@ -12,7 +12,7 @@ var groupModelSchema = new Schema({
     //groupMembers:[{type:Schema.Types.ObjectId,required:true}],
     GroupCategory_id: { type:Schema.Types.ObjectId,required:true},
     privacy: { type: String,   trim: true, default:"open"},
-    owner_id: {type:Schema.Types.ObjectId,required:true, ref: 'UserModel'},
+    owner_id: {type:Schema.Types.ObjectId,required:true, },//ref: 'UserModel'
     admin_id: [{type:Schema.Types.ObjectId,required:true}],
     image: { type: String,default:null},
     groupCreateddate: { type: Date,  default: Date.now() },
@@ -22,6 +22,7 @@ var groupModelSchema = new Schema({
    // RequestedBy: [{type:Schema.Types.ObjectId}],
    isRequested:{ type: Boolean},
   countMembers:{type:Number},
+
 });
 
 

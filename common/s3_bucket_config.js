@@ -16,12 +16,12 @@ const s3 = new AWS.S3({
 const uploadFile = (fileName, userName) => {
     return new Promise(function(resolve, reject){
         // Read content from the file
-        const fileContent = fs.readFileSync(fileName);
-        const imageExtension = path.extname(fileName);
+        const fileContent = fileName;//fs.readFileSync(fileName);
+       // const imageExtension = path.extname(fileName);
         // Setting up S3 upload parameters
         const params = {
             Bucket: BUCKET_NAME,
-            Key: userName+"_"+new Date().getTime()+imageExtension, // File name you want to save as in S3
+            Key: userName+"_"+new Date().getTime()+".png",//+imageExtension, // File name you want to save as in S3
             Body: fileContent,
             ACL:'public-read'
         };

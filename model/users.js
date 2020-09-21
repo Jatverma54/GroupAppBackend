@@ -24,7 +24,7 @@ var UserModelSchema = new mongoose.Schema({
         name:{
             type: String,
         },
-        GroupCategoryid: { type:Schema.Types.ObjectId,required:true},
+        GroupCategoryid: { type:Schema.Types.ObjectId,},
 
     }],
     Requested_groups: [{
@@ -65,11 +65,11 @@ UserModelSchema.methods.generateAuthToken = async function () {
     return token
 }
 
-UserModelSchema.virtual('groupModels', {
-    ref: 'groupModel',
-    localField: '_id',
-    foreignField: 'owner_id'
-})
+// UserModelSchema.virtual('groupModels', {
+//     ref: 'groupModel',
+//     localField: '_id',
+//     foreignField: 'owner_id'
+// })
 
 UserModelSchema.methods.toJSON = function () {
     const user = this
