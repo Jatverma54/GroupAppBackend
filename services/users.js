@@ -1,40 +1,52 @@
 var UserModel = require('./../model/users');
-const auth = require('../middleware/auth')
+const auth = require('../middleware/auth');
+const sendEmail = require('./../common/mailer_config');
+const uploadFile = require('./../common/s3_bucket_config');
 
 exports.addUser = function(req, res, next){
     try{
-    console.log("req.body", req.body);
-    var UserData = new UserModel(req.body);
-    UserData.save(async (err, result)=> {
-        console.log("*****err", err);
-      
-        if (err) {
-
-            if(err.errors.email!==undefined){
-         //  if(err.errmsg.includes("email")){
-            res.status(400).send({error: "Email Id already exist" })
-        
-            }
-           else if(err.errors.username!==undefined){//(err.errmsg.includes("username")){
-            res.status(400).send({error:"Username already exist" });
-           }
-        
-        else{
-            res.status(400).send({error: err })
-        }          
-        } else {
-          //  const token = await UserData.generateAuthToken()
-            res.status(201).send({message: "Data saved successfully.", result,  })//token
-            //res.send({message: "Data saved successfully.", result: result});
-
-            console.log(result,"Resultttttttttt")
-        }
-        
-        // saved!
-    })
-}catch(e){
-    res.status(500).send({error:e});
-}
+        uploadFile(req.body.profile.profilePic, req.body.username)
+        .then(function(picLocation){
+            req.body.profile.profile_pic = picLocation;
+            console.log("****req.body",req.body);
+            var UserData = new UserModel(req.body);
+            UserData.save((err, result)=> {
+                if (err) {
+                    console.log("*****err", err);
+                    if(err.errors.email!==undefined){
+                        res.status(400).send({error: "Email Id already exist" })
+                }
+                else if(err.errors.username!==undefined){
+                        res.status(400).send({error:"Username already exist" });
+                }      
+                } else {
+                    console.log("result", result);
+                    
+                        var params = {
+                            userID:  result._id,
+                            email: result.email
+                        }
+                        sendEmail(params, function(err, resp){
+                            if(err){
+                                console.log("mail error", err);
+                                res.status(400).send({error: "Unable to register. Internal error occured." });
+                            } else {
+                                console.log("mail success");
+                                res.status(201).send({message: "Data saved successfully.", result  })     
+                            }
+                        });
+                
+                    
+                }
+                // saved!
+            })
+        }).catch(function(e){
+            console.log("Failed to upload profile pic", e);
+            res.status(400).send({error:"Failed to upload profile pic" });
+        });
+    } catch(e){
+        res.status(500).send({error: e });
+    }
 }
 
 
