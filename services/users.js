@@ -5,10 +5,11 @@ const uploadFile = require('./../common/s3_bucket_config');
 
 exports.addUser = function(req, res, next){
     try{
+        
         uploadFile(req.body.profile.profilePic, req.body.username)
         .then(function(picLocation){
             req.body.profile.profile_pic = picLocation;
-            console.log("****req.body",req.body);
+            //console.log("****req.body",req.body);
             var UserData = new UserModel(req.body);
             UserData.save((err, result)=> {
                 if (err) {
@@ -41,7 +42,7 @@ exports.addUser = function(req, res, next){
                 // saved!
             })
         }).catch(function(e){
-            console.log("Failed to upload profile pic", e);
+           console.log("Failed to upload profile pic", e);
             res.status(400).send({error:"Failed to upload profile pic" });
         });
     } catch(e){

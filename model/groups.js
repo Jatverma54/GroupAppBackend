@@ -22,7 +22,7 @@ var groupModelSchema = new Schema({
    // RequestedBy: [{type:Schema.Types.ObjectId}],
    isRequested:{ type: Boolean},
   countMembers:{type:Number},
-
+LastUpdated: { type: Date,  default:  Date.now() },
 });
 
 

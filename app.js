@@ -18,16 +18,21 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(cors());
 app.use(logger('dev'));
-app.use(express.json());
+//app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.json());
+//app.use(bodyParser.json());
+app.use(bodyParser.json({ 'type': '*/*',limit: '20mb' }));
+app.use(bodyParser.urlencoded({limit: '200mb', parameterLimit: 200000,extended: true}));
+app.use(express.json());
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/admin', adminRouter);
 app.use('/groups', groupRouter);
 
+// app.use(bodyParser.json({limit: '200mb',extended: true}));
+// app.use(bodyParser.urlencoded({limit: '200mb', parameterLimit: 200000,extended: true}));
 
 
 
