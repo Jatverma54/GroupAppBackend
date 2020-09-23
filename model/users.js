@@ -52,7 +52,8 @@ var UserModelSchema = new mongoose.Schema({
             type: String,
             required: true
         }
-    }]
+    }],
+    isActive: { type: Boolean, required: true, default: false }
 });
 
 UserModelSchema.methods.generateAuthToken = async function () {
@@ -85,10 +86,9 @@ UserModelSchema.methods.toJSON = function () {
 }
 
 UserModelSchema.statics.findByCredentials = async (username, password) => {
-    const user = await User.findOne({ username })
-
+    const user = await User.findOne({ username, isActive: true });
     if (!user) {
-        throw new Error('Unable to login')
+        throw new Error('Unable to login');
     }
 
     const isMatch = await bcrypt.compare(password, user.password)

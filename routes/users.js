@@ -53,5 +53,8 @@ router.post('/logout', auth, async (req, res) => {
 })
 
 
+router.get('/verify/:id', function(req, res){
+    userObj.updateUser(req, res);
+});
 
 module.exports = router;
