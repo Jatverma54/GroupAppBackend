@@ -2,22 +2,23 @@ var UserModel = require('./../model/users');
 const auth = require('../middleware/auth');
 const sendEmail = require('./../common/mailer_config');
 const uploadFile = require('./../common/s3_bucket_config');
+const CONSTANT = require('./../common/constant');
 
 exports.addUser = function(req, res, next){
     try{
         // uploadFile("C:/Users/snagdeote/Desktop/New folder/Groupapp_project/develop/images/promo-image.jpg", req.body.username)
         if(req.body.profile && req.body.profile.profilePic){
-            uploadFile(req.body.profile.profilePic, req.body.username)
+            uploadFile(req.body.profile.profilePic, req.body.username,CONSTANT.ProfilePictureBucketName)
             .then(picLocation => saveUserInDB(req, res, picLocation))
             .catch(function(e){
                 console.log("Failed to upload profile pic", e);
                 res.status(400).send({error:"Failed to upload profile pic" });
             });
         } else {
-            saveUserInDB(req, res, "")
+            saveUserInDB(req, res, CONSTANT.PlaceholderImageUrl)
         }
     } catch(e){
-        res.status(500).send({error: e });
+        res.status(500).send({error: "Something went wrong" });
     }
 }
 

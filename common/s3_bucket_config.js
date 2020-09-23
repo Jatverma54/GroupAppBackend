@@ -6,14 +6,14 @@ const ID = 'AKIAJT524GEZ7PPA3GPQ';
 const SECRET = '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';
 //const Buffer=require('buffer');
 // The name of the bucket that you have created
-const BUCKET_NAME = 'groupappproject';
+//const BUCKET_NAME = 'groupappproject/ProfilePictures';
 
 const s3 = new AWS.S3({
     accessKeyId: ID,
     secretAccessKey: SECRET
 });
 
-const uploadFile = (fileName, userName) => {
+const uploadFile = (fileName, userName,BUCKET_NAME) => {
     return new Promise (async function(resolve, reject){
         // Read content from the file
      //   const fileContent = fileName;//fs.readFileSync(fileName);

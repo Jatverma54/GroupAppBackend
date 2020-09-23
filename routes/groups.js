@@ -56,4 +56,7 @@ router.get('/getJoinedPublicGroups', auth,function(req, res){
     groupsObj.getJoinedPublicGroups(req,res);
 });
 
+
+
+
 module.exports = router;
