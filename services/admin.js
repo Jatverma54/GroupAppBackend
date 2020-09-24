@@ -12,10 +12,10 @@ try{
     //var CategoryData = new CategoryModel(req.body);
  
     CategoryModel.insertMany(req.body ,async (err, result)=> {
-        console.log("*****err", err);
+        //console.log("*****err", err);
         if (err) {
 
-            console.log("req.body", err);
+            //console.log("req.body", err);
             res.status(400).send({error:err});
           
                      
@@ -25,9 +25,9 @@ try{
             res.status(201).send({message: "Data saved successfully.", result,  })//token
             //res.send({message: "Data saved successfully.", result: result});
 
-            console.log(result,"Resultttttttttt")
+            //console.log(result,"Resultttttttttt")
         }
-       console.log();
+       //console.log();
   })         
 }else{
     res.status(400).send("User is not an Admin");

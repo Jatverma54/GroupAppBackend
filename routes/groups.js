@@ -10,7 +10,7 @@ const CONSTANT = require('../common/constant');
 router.post('/createNewGroup', auth,function(req, res){
 
    
-    console.log("****req.body of createNewGroup", req.body);
+    //console.log("****req.body of createNewGroup", req.body);
     groupsObj.addNewGroup(req, res);
   
 });
@@ -28,34 +28,44 @@ router.post('/getPublicGroupsWithCategory', auth,function(req, res){
 });
 
 router.delete('/:id', auth,function(req, res){
-    console.log("****req.body.password", req.body.password);
+    //console.log("****req.body.password", req.body.password);
     groupsObj.deleteData(req,res);
 });
 
 
 router.post('/ViewGroupMembers', auth,function(req, res){
-    console.log("****req.body.password", req.body);
+    //console.log("****req.body.password", req.body);
     groupsObj.viewGroupMembers(req,res);
 });
 
 
 router.post('/SendJoinRequest', auth,function(req, res){
-    console.log("****req.body.password", req.body);
+    //console.log("****req.body.password", req.body);
     groupsObj.SendJoinRequest(req,res);
 });
 
 
 router.post('/DeleteSentJoinRequest', auth,function(req, res){
-    console.log("****req.body.password", req.body);
+    //console.log("****req.body.password", req.body);
     groupsObj.DeleteSentJoinRequest(req,res);
 });
 
 
 router.get('/getJoinedPublicGroups', auth,function(req, res){
-    console.log("****req.body.password", req.body);
+    //console.log("****req.body.password", req.body);
     groupsObj.getJoinedPublicGroups(req,res);
 });
 
+router.post('/updateGroupimage', auth,function(req, res){
+ 
+    groupsObj.updateGroupImage(req,res);
+});
+
+
+router.post('/updateGroupinformation', auth,function(req, res){
+ 
+    groupsObj.updateGroupinformation(req,res);
+});
 
 
 

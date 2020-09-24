@@ -10,7 +10,7 @@ var transporter = nodemailer.createTransport({
 });
 
 function sendEmail(params, callback){
-  console.log("****params", params);
+  //console.log("****params", params);
   var mailOptions = {
       from: CONSTANT.ADMIN_EMAIL,
       to: params.email,

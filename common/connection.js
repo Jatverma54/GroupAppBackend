@@ -4,5 +4,5 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connectionasdf error:'));
  
 db.once('open', function() {
-  console.log("Successfully connected to MongoDB!");
+  //console.log("Successfully connected to MongoDB!");
 });

@@ -11,7 +11,7 @@ var groupModelSchema = new Schema({
     GroupCategory:{ type: String,   trim: true,},
     //groupMembers:[{type:Schema.Types.ObjectId,required:true}],
     GroupCategory_id: { type:Schema.Types.ObjectId,required:true},
-    privacy: { type: String,   trim: true, default:"open"},
+    privacy: { type: String,   trim: true, required:true},
     owner_id: {type:Schema.Types.ObjectId,required:true, },//ref: 'UserModel'
     admin_id: [{type:Schema.Types.ObjectId,required:true}],
     image: { type: String,default:null},

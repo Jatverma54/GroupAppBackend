@@ -11,7 +11,7 @@ exports.addUser = function(req, res, next){
             uploadFile(req.body.profile.profilePic, req.body.username,CONSTANT.ProfilePictureBucketName)
             .then(picLocation => saveUserInDB(req, res, picLocation))
             .catch(function(e){
-                console.log("Failed to upload profile pic", e);
+                //console.log("Failed to upload profile pic", e);
                 res.status(400).send({error:"Failed to upload profile pic" });
             });
         } else {
@@ -25,11 +25,11 @@ exports.addUser = function(req, res, next){
 
 function saveUserInDB(req, res, picLocation){
     req.body.profile.profile_pic = picLocation;
-            console.log("****req.body",req.body);
+            //console.log("****req.body",req.body);
             var UserData = new UserModel(req.body);
             UserData.save((err, result)=> {
                 if (err) {
-                    console.log("*****err", err);
+                    //console.log("*****err", err);
                     if(err.errors.email!==undefined){
                         res.status(400).send({error: "Email Id already exist" })
                 }
@@ -37,7 +37,7 @@ function saveUserInDB(req, res, picLocation){
                         res.status(400).send({error:"Username already exist" });
                 }      
                 } else {
-                    console.log("result", result);
+                    //console.log("result", result);
                     
                         var params = {
                             userID:  result._id,
@@ -45,11 +45,11 @@ function saveUserInDB(req, res, picLocation){
                         }
                         sendEmail(params, async function(err, resp){
                             if(err){
-                                console.log("mail error", err);
+                                //console.log("mail error", err);
                                 const deleteUser = await UserModel.remove({_id: result._id});
                                 res.status(400).send({error: "Unable to register. Internal error occured." });
                             } else {
-                                console.log("mail success");
+                                //console.log("mail success");
                                 res.status(201).send({message: "Data saved successfully.", result  })     
                             }
                         });
@@ -100,7 +100,7 @@ exports.loginUser = async (req, res)=>{
         },{$set:{isActive: true}});
         res.send("User verified successfully");
     }catch(err){
-        console.log(err)
+        //console.log(err)
         res.status(400).send({message: err});
 
     }

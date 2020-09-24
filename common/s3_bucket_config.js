@@ -20,13 +20,13 @@ const uploadFile = (fileName, userName,BUCKET_NAME) => {
   
     //  const mimeInfo = fileType(Buffer.from(fileName, 'base64'))
 
-    //  console.log(mimeInfo)
+    //  //console.log(mimeInfo)
 
     //  const contents = fs.readFileSync(fileName);
-    //  console.log("Entered")
+    //  //console.log("Entered")
 
    
-      //  console.log(FileType.fromFile('Unicorn.png'));
+      //  //console.log(FileType.fromFile('Unicorn.png'));
         //=> {ext: 'png', mime: 'image/png'}
    
     
@@ -57,7 +57,7 @@ const uploadFile = (fileName, userName,BUCKET_NAME) => {
             } else {
                 resolve(data.Location);
             }
-            console.log(`File uploaded successfully. ${data.Location}`);
+            //console.log(`File uploaded successfully. ${data.Location}`);
         });
     });
 };
