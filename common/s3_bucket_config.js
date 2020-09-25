@@ -13,7 +13,7 @@ const s3 = new AWS.S3({
     secretAccessKey: SECRET
 });
 
-const uploadFile = (fileName, userName,BUCKET_NAME) => {
+exports.uploadFile = (fileName, userName,BUCKET_NAME) => {
     return new Promise (async function(resolve, reject){
         // Read content from the file
      //   const fileContent = fileName;//fs.readFileSync(fileName);
@@ -61,5 +61,39 @@ const uploadFile = (fileName, userName,BUCKET_NAME) => {
         });
     });
 };
+exports.removeFileFromS3 = function(filename, BUCKET_NAME, callback) {
+    var params = {
+      Bucket: BUCKET_NAME,
+      Key: filename
+    };
+    s3.deleteObject(params, function(err, data) {
+      if (err) {
+        console.log(err);
+        callback(err, null);
+      } else {
+        callback(null, true);
+      }
+    });
+  }
 
-module.exports = uploadFile;
+  exports.removeMultipleFilesFromS3 = function(filenameObjects, BUCKET_NAME, callback) {
+    //Input format
+    /*var filenameObjects = [];
+    for(var k in file){
+      filenameObjects.push({Key : file[k].fileName});
+    }*/
+    var params = {
+      Bucket: BUCKET_NAME,
+      Delete: {
+        Objects: filenameObjects
+      }
+    };
+    s3.deleteObjects(params, function(err, data) {
+      if (err) {
+        console.log(err);
+        callback(err, null);
+      } else {
+        callback(null, true);
+      }
+    });
+  }

@@ -2,7 +2,7 @@ var groupModel = require('./../model/groups');
 const auth = require('../middleware/auth');
 var CategoryModel = require('./../model/categories');
 var UserModel = require('./../model/users');
-const uploadFile = require('./../common/s3_bucket_config');
+const s3Config = require('./../common/s3_bucket_config');
 const CONSTANT = require('./../common/constant');
 
 
@@ -12,7 +12,7 @@ exports.addNewGroup = async (req, res, next) => {
        // //console.log(categoryData,"sssssssssssssssssssssssssss")
         //console.log("req.body", req.body);
         if(req.body.image){
-            uploadFile(req.body.image, req.body.GroupName+"_"+req.user._id,CONSTANT.GroupProfilePictureBucketName)
+            s3Config.uploadFile(req.body.image, req.body.GroupName+"_"+req.user._id,CONSTANT.GroupProfilePictureBucketName)
             .then(picLocation => savegroupInDB(req, res, picLocation,categoryData))
             .catch(function(e){
                 //console.log("Failed to upload profile pic", e);
@@ -314,17 +314,26 @@ exports.getJoinedPublicGroups = async (req, res) => {
 exports.updateGroupImage = async (req, res)=>{
     try{
 
-        uploadFile(req.body.image, req.body.groupid+"_"+req.user._id,CONSTANT.GroupProfilePictureBucketName)
+        s3Config.uploadFile(req.body.image, req.body.groupid+"_"+req.user._id,CONSTANT.GroupProfilePictureBucketName)
         .then(async picLocation => {
 
             var GroupID = req.body.groupid;
-            var userVerified = await groupModel.update({
+            var userVerified = await groupModel.findOneAndUpdate({
                 _id: GroupID,
             },{$set:{image: picLocation}});
+            const filename = userVerified.image.split('/').slice(-1)[0];
+            s3Config.removeFileFromS3(filename, CONSTANT.GroupProfilePictureBucketName, function(err, res){
+                if(err){
+                    console.log("Unable to delete older image from S3.");
+                } else {
+                    console.log("Removed older image from S3 successfully.");
+                }
+            });
             res.status(200).send("Image Uploaded successfully");
+            console.log(userVerified);
         })
         .catch(function(e){
-           // //console.log("Failed to upload profile pic", e);
+           console.log("Failed to upload profile pic", e);
             res.status(400).send({error:"Failed to upload profile pic" });
         });
 
