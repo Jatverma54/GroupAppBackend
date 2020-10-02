@@ -68,5 +68,46 @@ router.post('/updateGroupinformation', auth,function(req, res){
 });
 
 
+router.post('/AdmindeleteUserfromtheGroup', auth,function(req, res){
+ 
+    groupsObj.AdmindeleteUserfromtheGroup(req,res);
+});
+
+router.post('/DismissUserAsAdmin', auth,function(req, res){
+ 
+    groupsObj.DismissUserAsAdmin(req,res);
+});
+
+
+router.post('/MakeUserAsAdmin', auth,function(req, res){
+ 
+    groupsObj.MakeUserAsAdmin(req,res);
+});
+
+
+router.post('/getAllGroupRequest', auth,function(req, res){
+ 
+    groupsObj.getAllGroupRequest(req,res);
+});
+
+
+router.post('/confirmGroupRequest', auth,function(req, res){
+ 
+    groupsObj.confirmGroupRequest(req,res);
+});
+
+
+
+router.post('/removeGroupRequest', auth,function(req, res){
+ 
+    groupsObj.removeGroupRequest(req,res);
+});
+
+
+router.post('/leaveGroup', auth,function(req, res){
+    //console.log("****req.body.password", req.body.password);
+    groupsObj.leaveGroup(req,res);
+});
+
 
 module.exports = router;

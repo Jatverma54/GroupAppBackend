@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt')
 var uniqueValidator = require('mongoose-unique-validator');
+var postModel = require('./posts');
 //Define a schema
 var Schema = mongoose.Schema;
 
@@ -25,6 +26,7 @@ var UserModelSchema = new mongoose.Schema({
             type: String,
         },
         GroupCategoryid: { type:Schema.Types.ObjectId,},
+      //  group_type:{ type:Schema.Types.ObjectId,},
 
     }],
     Requested_groups: [{
@@ -39,13 +41,13 @@ var UserModelSchema = new mongoose.Schema({
         }
     }],
     admin_id: [{type:Schema.Types.ObjectId,}],
-   
+    //owner_id: {type:Schema.Types.ObjectId},
     profile: {
         profile_pic: String,
         dob:{ type: Date, required: true,trim: true },
         full_name: { type: String, required: true,  trim: true },
         role: { type: String, required: true,  trim: true, default:"User" },
-        UserCreateddate: { type: Date,  default: Date.now() }
+        UserCreateddate: { type: Date,  default: Date() }
     },
     tokens: [{
         token: {
@@ -80,7 +82,7 @@ UserModelSchema.methods.toJSON = function () {
     delete userObject.tokens
     delete userObject.created_groups
     delete userObject.joined_groups
-    delete userObject.Requested_groups
+   // delete userObject.Requested_groups
 
     return userObject
 }
@@ -99,6 +101,18 @@ UserModelSchema.statics.findByCredentials = async (username, password) => {
 
     return user
 }
+
+UserModelSchema.virtual('posts', {
+    ref: 'postModel',
+    localField: '_id',
+    foreignField: 'OnwerId'
+  })
+
+//   UserModelSchema.pre('remove', async function (next) {
+//     const user = this
+//     await postModel.deleteMany({ OnwerId: user._id })
+//     next()
+//   })
 
 UserModelSchema.plugin(uniqueValidator);
 

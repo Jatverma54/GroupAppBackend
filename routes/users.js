@@ -57,4 +57,11 @@ router.get('/verify/:id', function(req, res){
     userObj.updateUser(req, res);
 });
 
+
+router.get('/userInformation',auth, function(req, res){
+    //console.log("****User data");
+    userObj.userInformation(req,res);
+});
+
+
 module.exports = router;

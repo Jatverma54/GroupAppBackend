@@ -8,9 +8,9 @@ const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const adminRouter = require('./routes/admin');
 const groupRouter = require('./routes/groups');
+const groupPostRouter = require('./routes/posts');
 const bodyParser =require('body-parser');
 const connection = require('./common/connection');
-
 const app = express();
 
 // view engine setup
@@ -30,10 +30,14 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/admin', adminRouter);
 app.use('/groups', groupRouter);
+app.use('/groupPost', groupPostRouter);
 
 // app.use(bodyParser.json({limit: '200mb',extended: true}));
 // app.use(bodyParser.urlencoded({limit: '200mb', parameterLimit: 200000,extended: true}));
 
+app.get('/', function(req, res){
+  res.render('form');
+});
 
 
 
