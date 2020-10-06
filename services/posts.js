@@ -609,3 +609,54 @@ exports.getAllPublicJoinedPostofGroup = async (req, res) => {
 
 }
 
+
+
+
+// exports.getAllPersonalPostofGroup = async (req, res) => {
+//     try {
+//         const group = await groupModel.findById(req.body.groupId);
+
+//         await group.populate({ path: 'posts', options: { sort: { time: -1 } } }).execPopulate();
+//         var postData = group.posts;
+//         // const userData = await UserModel.findById(postdata[0].OnwerId);
+//         //   await user.populate('posts').execPopulate();
+//         let postdataObjectArray = [];
+//         let GroupMembers=''
+//         for (var data in postData) {
+//             let postdataObject = postData[data].toObject();
+//             postdataObject.countLikes = postData[data].likedBy.length;
+//             postdataObject.countcomments = postData[data].Comments.length;
+//             postdataObject.GroupName = group.GroupName;
+//             postdataObject.GroupAdmin = group.admin_id;
+//             postdataObject.isLiked = postData[data].likedBy.find(a => a.toString() === req.user._id.toString()) ? true : false;
+//             postdataObject.currentUser = req.user._id;
+//             postdataObject.currentUserPic = req.user.profile.profile_pic;
+//             // postdataObject.currentUser = req.user._id;
+//             let toBeInserted = [];
+//             if (postData[data].likedBy.length !== 0) {
+
+//                 for (var i = 0; i < postData[data].likedBy.length; i++) {
+//                     if (i <= 5) {
+//                         const userData = await UserModel.findById(postData[data].likedBy[i]);
+//                         toBeInserted.push(userData.profile.profile_pic);
+//                     }
+//                 }
+
+//             }
+//             postdataObject.LikePictures = toBeInserted
+
+//             postdataObjectArray.push(postdataObject)
+//         }
+
+//          GroupMembers = await UserModel.find({ "joined_groups.groupid": group._id, });
+
+//          postdataObjectArray.push({"GroupMembers":GroupMembers})
+
+
+//         res.status(200).json({ message: "User as Admin: ", result: postdataObjectArray });
+//     } catch (err) {
+//         console.log(err)
+//         res.status(400).json({ message: err });
+//     }
+
+// }

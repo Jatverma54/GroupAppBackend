@@ -4,6 +4,7 @@ const path = require('path');
 const fileType = require('file-type')
 const ID = 'AKIAJT524GEZ7PPA3GPQ';
 const SECRET = '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';
+const CONSTANT = require('./../common/constant');
 //const Buffer=require('buffer');
 // The name of the bucket that you have created
 //const BUCKET_NAME = 'groupappproject/ProfilePictures';
@@ -62,6 +63,10 @@ exports.uploadFile = (fileName, userName,BUCKET_NAME) => {
     });
 };
 exports.removeFileFromS3 = function(filename, BUCKET_NAME, callback) {
+
+  const filenamePlaceHolder = CONSTANT.PlaceholderImageUrl.split('/').slice(-1)[0];
+  if(filename.toString().trim()!==filenamePlaceHolder.toString().trim()){
+   
     var params = {
       Bucket: BUCKET_NAME,
       Key: filename
@@ -74,6 +79,8 @@ exports.removeFileFromS3 = function(filename, BUCKET_NAME, callback) {
         callback(null, true);
       }
     });
+
+  }
   }
 
   exports.removeMultipleFilesFromS3 = function(filenameObjects, BUCKET_NAME, callback) {

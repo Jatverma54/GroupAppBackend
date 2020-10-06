@@ -12,7 +12,8 @@ var UserModelSchema = new mongoose.Schema({
     password: { type: String, required: true,  trim: true, },
     created_groups: [{
         groupid: {
-            type: Schema.Types.ObjectId,         
+            type: Schema.Types.ObjectId,   
+            ref: 'groupModel'        
         },
         name:{
             type: String,
@@ -20,7 +21,8 @@ var UserModelSchema = new mongoose.Schema({
     }],
     joined_groups: [{
         groupid: {
-            type: Schema.Types.ObjectId,         
+            type: Schema.Types.ObjectId,  
+            ref: 'groupModel'       
         },
         name:{
             type: String,
@@ -107,6 +109,22 @@ UserModelSchema.virtual('posts', {
     localField: '_id',
     foreignField: 'OnwerId'
   })
+
+  UserModelSchema.virtual('group', {
+    ref: 'groupModel',
+   
+    localField: 'joined_groups.groupid',
+    foreignField: '_id'
+  })
+  
+
+  UserModelSchema.virtual('createdgroup', {
+    ref: 'groupModel',
+   
+    localField: 'created_groups.groupid',
+    foreignField: '_id'
+  })
+  
 
 //   UserModelSchema.pre('remove', async function (next) {
 //     const user = this

@@ -64,4 +64,10 @@ router.get('/userInformation',auth, function(req, res){
 });
 
 
+router.post('/updateUserImage',auth, function(req, res){
+    //console.log("****User data");
+    userObj.updateUserImage(req,res);
+});
+
+
 module.exports = router;

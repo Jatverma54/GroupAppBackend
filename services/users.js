@@ -3,7 +3,7 @@ const auth = require('../middleware/auth');
 const sendEmail = require('./../common/mailer_config');
 const uploadFile = require('./../common/s3_bucket_config');
 const CONSTANT = require('./../common/constant');
-
+const s3Config = require('./../common/s3_bucket_config');
 exports.addUser = function (req, res, next) {
     try {
         // uploadFile("C:/Users/snagdeote/Desktop/New folder/Groupapp_project/develop/images/promo-image.jpg", req.body.username)
@@ -45,8 +45,19 @@ function saveUserInDB(req, res, picLocation) {
             }
             sendEmail(params, async function (err, resp) {
                 if (err) {
-                    //console.log("mail error", err);
                     const deleteUser = await UserModel.remove({ _id: result._id });
+                    //console.log("mail error", err);
+                    const filename = picLocation.split('/').slice(-1)[0];
+      
+                    s3Config.removeFileFromS3(filename, CONSTANT.ProfilePictureBucketName, function(err, res){
+                        if(err){
+                            console.log("Unable to delete older image from S3.");
+                        } else {
+                            console.log("Removed older image from S3 successfully.");
+                        }
+                    });
+             
+                  
                     res.status(400).send({ error: "Unable to register. Internal error occured." });
                 } else {
                     //console.log("mail success");
@@ -115,4 +126,43 @@ exports.userInformation = async (req, res) => {
     } catch (err) {
         res.status(400).json({ message: err });
     }
+}
+
+
+
+exports.updateUserImage = async (req, res) => {
+    try {
+
+        s3Config.uploadFile(req.body.image, req.body.UserId + "_" + req.user.username, CONSTANT.ProfilePictureBucketName)
+            .then(async picLocation => {
+
+                var UserId = req.user._id;
+                var userVerified = await UserModel.findOneAndUpdate({
+                    _id: UserId,
+                }, { $set: { "profile.profile_pic": picLocation } });
+
+                const filename = userVerified.profile.profile_pic.split('/').slice(-1)[0];
+                     
+                s3Config.removeFileFromS3(filename, CONSTANT.ProfilePictureBucketName, function (err, res) {
+                    if (err) {
+                        console.log("Unable to delete older image from S3.");
+                    } else {
+                        console.log("Removed older image from S3 successfully.");
+                    }
+                });
+                res.status(200).send("Image Uploaded successfully");
+               // console.log(userVerified);
+            })
+            .catch(function (e) {
+                console.log("Failed to upload profile pic", e);
+                res.status(400).send({ error: "Failed to upload profile pic" });
+            });
+
+    } catch (err) {
+        //console.log(err)
+        res.status(500).send({ error: "Internal Server error" });
+
+    }
+
+
 }

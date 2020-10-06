@@ -6,24 +6,29 @@ const s3Config = require('./../common/s3_bucket_config');
 var postModel = require('./../model/posts');
 
 const CONSTANT = require('./../common/constant');
+const { response } = require('express');
 
 
 exports.addNewGroup = async (req, res, next) => {
     try {
-        var categoryData = await CategoryModel.findOne({ _id: req.body.GroupCategory_id });
+        if (req.body.group_type === "public") {
+            var categoryData = await CategoryModel.findOne({ _id: req.body.GroupCategory_id });
+            req.body.GroupCategory = categoryData.title;
+        }
+
         // //console.log(categoryData,"sssssssssssssssssssssssssss")
         //console.log("req.body", req.body);
-        if(req.body.image){
-            s3Config.uploadFile(req.body.image, req.body.GroupName+"_"+req.user._id,CONSTANT.GroupProfilePictureBucketName)
-            .then(picLocation => savegroupInDB(req, res, picLocation,categoryData))
-            .catch(function(e){
-                //console.log("Failed to upload profile pic", e);
-                res.status(400).send({error:"Failed to upload profile pic" });
-            });
+        if (req.body.image) {
+            s3Config.uploadFile(req.body.image, req.body.GroupName + "_" + req.user._id, CONSTANT.GroupProfilePictureBucketName)
+                .then(picLocation => savegroupInDB(req, res, picLocation))
+                .catch(function (e) {
+                    //console.log("Failed to upload profile pic", e);
+                    res.status(400).send({ error: "Failed to upload profile pic" });
+                });
 
         }
         else {
-            savegroupInDB(req, res, CONSTANT.PlaceholderImageUrl, categoryData)
+            savegroupInDB(req, res, CONSTANT.PlaceholderImageUrl)
         }
     } catch (err) {
 
@@ -31,10 +36,10 @@ exports.addNewGroup = async (req, res, next) => {
     }
 }
 
-function savegroupInDB(req, res, picLocation, categoryData) {
+function savegroupInDB(req, res, picLocation) {
 
     try {
-        req.body.GroupCategory = categoryData.title;
+
         req.body.GroupAdminName = req.user.profile.full_name;
         req.body.image = picLocation;
 
@@ -47,8 +52,8 @@ function savegroupInDB(req, res, picLocation, categoryData) {
             if (err) {
 
                 //  if(err.errmsg){
-                if (err.errors&& err.errors.GroupName !== undefined) {
-                    
+                if (err.errors && err.errors.GroupName !== undefined) {
+
                     res.status(400).send({ error: "Group Name already exist" })
                 }
                 else {
@@ -59,7 +64,7 @@ function savegroupInDB(req, res, picLocation, categoryData) {
             } else {
                 //  const user = await UserModel.findOne({_id:req.body.owner_id});
                 //   const user = await UserModel.findByIdAndUpdate(req.body.owner_id, { joined_groups: { $push: {groupid: result._id,name:result.GroupName}} })
-                req.user.joined_groups = req.user.joined_groups.concat({ groupid: result._id, GroupCategoryid: result.GroupCategory_id})//name: result.GroupName,
+                req.user.joined_groups = req.user.joined_groups.concat({ groupid: result._id })//name: result.GroupName,GroupCategoryid: result.GroupCategory_id
                 req.user.created_groups = req.user.created_groups.concat({ groupid: result._id })//name: result.GroupName 
                 await req.user.save();
 
@@ -95,13 +100,6 @@ exports.getPublicGroupsWithCategory = async (req, res) => {
 
         var groupData = await groupModel.find({ group_type: "public", GroupCategory_id: req.body.GroupCategory_id });
 
-        //   const userData = await UserModel.find();
-
-        // const userData = await UserModel.aggregate([
-        //     { "$match": { "joined_groups.groupid": item._id } },
-
-        //     { "$match": { "joined_groups.name": item.GroupName } }]);;
-
         for (var data in groupData) {
             groupData[data].isRequested = req.user.Requested_groups.find(a => a.groupid.toString() === groupData[data]._id.toString()) ? true : false;
             groupData[data].isJoined = req.user.joined_groups.find(a => a.groupid.toString() === groupData[data]._id.toString()) ? true : false;
@@ -109,19 +107,9 @@ exports.getPublicGroupsWithCategory = async (req, res) => {
 
         }
 
-        //  groupData = groupData.map(  item => {
-        //    item.isRequested =  req.user.Requested_groups.find(a=>a.groupid.toString()===item._id.toString())?true:false;
-        //    item.isJoined =  req.user.joined_groups.find(a=>a.groupid.toString()===item._id.toString())?true:false;  
-        //     // let filteredArray = userData.filter((element) => element.joined_groups.some((groupid) => groupid.groupid.toString() === item._id.toString()));
-        //     //  item.countMembers=filteredArray.length;
-        //    return item;    
-        //         });
-
-
-
         res.status(200).json({ message: "Data: ", result: groupData });
     } catch (err) {
-        //console.log(err)
+        console.log(err)
         res.status(400).json({ error: err });
     }
 }
@@ -129,8 +117,21 @@ exports.getPublicGroupsWithCategory = async (req, res) => {
 
 exports.deleteData = async (req, res) => {
     try {
+        const GroupData = await groupModel.findById(req.params.id);
         const RemovedData = await groupModel.remove({ _id: req.params.id });
-       await postModel.deleteMany({ GroupId: req.params.id })//changes
+        await postModel.deleteMany({ GroupId: req.params.id })//changes
+
+
+        const filename = GroupData.image.split('/').slice(-1)[0];
+
+        s3Config.removeFileFromS3(filename, CONSTANT.GroupProfilePictureBucketName, function (err, res) {
+            if (err) {
+                console.log("Unable to delete older image from S3.");
+            } else {
+                console.log("Removed older image from S3 successfully.");
+            }
+        });
+
         const RemovedUserData = await UserModel.find({ "joined_groups.groupid": req.params.id });
 
         for (var id in RemovedUserData) {
@@ -194,6 +195,7 @@ exports.viewGroupMembers = async (req, res) => {
 exports.SendJoinRequest = async (req, res) => {
     try {
 
+        if(req.body.privacy!=="Open Group"){
         req.user.Requested_groups = req.user.Requested_groups.concat({
             groupid:
                 req.body.groupid,
@@ -203,7 +205,12 @@ exports.SendJoinRequest = async (req, res) => {
                 req.body.requestMessage ? req.body.requestMessage : "Do you want to add the user to the group"
 
         })
+    }else{
+      
+        req.user.joined_groups = req.user.joined_groups.concat({ groupid: req.body.groupid, GroupCategoryid: req.body.GroupCategory_id })//name: result.GroupName,
+   
 
+    }
         await req.user.save()
 
         res.status(200).json({ message: "Request Sent: ", result: req.user });
@@ -238,38 +245,54 @@ exports.getJoinedPublicGroups = async (req, res) => {
 
         var Response = []
 
-        if (req.user.created_groups.length !== 0) {
+
+        var Gdata = await req.user.populate({ path: 'createdgroup' }).execPopulate();
+        var groupData = Gdata.createdgroup;
+
+        groupData = groupData.filter(a => a.group_type.toString() === "public")
+
+        if (req.user.created_groups.length !== 0 && groupData.length !== 0) {
 
             let ToBeInserted = {
                 GroupCategory: "Your Groups",
                 data: []
             }
-            for (var data in req.user.created_groups) {
+            for (var data in groupData) {
 
-                const groupData = await groupModel.findOne({ _id: req.user.created_groups[data].groupid });
+                // const groupData = await groupModel.findOne({ _id: req.user.created_groups[data].groupid });
                 // //console.log(groupData)
-                groupData.countMembers = await UserModel.countDocuments({ "joined_groups.groupid": groupData._id, });
+                groupData[data].countMembers = await UserModel.countDocuments({ "joined_groups.groupid": groupData[data]._id, });
 
-                const groupObject = groupData.toObject()
+                const groupObject = groupData[data].toObject()
                 //  delete groupObject.GroupCategory_id;
                 //  delete groupObject.admin_id;
                 //  delete groupObject.owner_id;
                 //  delete groupObject.__v;
                 groupObject.currentUser = req.user._id;
+
                 ToBeInserted.data.push({ groupObject })
             }
 
             Response.push(ToBeInserted)
         }
-        if (req.user.joined_groups.length !== 0) {
+
+
+        var PGdata = await req.user.populate({ path: 'group' }).execPopulate();
+        var postData = PGdata.group;
+
+        postData = postData.filter(a => a.group_type.toString() === "public")
+
+
+        if (req.user.joined_groups.length !== 0 && postData.length !== 0) {
 
             var categoryData = await CategoryModel.find();
             for (var data in categoryData) {
 
 
-                const groups = req.user.joined_groups.filter(a => a.GroupCategoryid.toString() === categoryData[data]._id.toString())
+                //    const groups = req.user.joined_groups.filter(a => a.GroupCategoryid.toString() === categoryData[data]._id.toString())
 
 
+                const groups = postData.filter(a => a.GroupCategory_id.toString() === categoryData[data]._id.toString())
 
                 if (groups.length !== 0) {
 
@@ -278,25 +301,30 @@ exports.getJoinedPublicGroups = async (req, res) => {
                         data: []
                     }
 
-                    for (var groupid in groups) {
+                    for (var groupDataArr in groups) {
 
-                        const groupData = await groupModel.findOne({ _id: groups[groupid].groupid });
+                        //  const groupData = await groupModel.findOne({ _id: groups[groupid].groupid });
 
                         // const isPresent = groupData.owner_id.toString()===req.user._id?true:false;//groupData.owner_id.filter((a) => a.toString() === req.user._id.toString());
                         // console.log(ToBeInserted.data,"sssssssssss")
                         //if (isPresent.length === 0) {
-                        if (groupData.owner_id.toString() !== req.user._id.toString()) {
-
-                            groupData.countMembers = await UserModel.countDocuments({ "joined_groups.groupid": groupData._id, });
 
 
-                            const groupObject = groupData.toObject()
+                        if (groups[groupDataArr].owner_id.toString() !== req.user._id.toString()) {
+
+
+                            groups[groupDataArr].countMembers = await UserModel.countDocuments({ "joined_groups.groupid": groups[groupDataArr]._id, });
+
+
+                            //const groupObject = groupData
                             // delete groupObject.GroupCategory_id;
                             // delete groupObject.admin_id;
                             // delete groupObject.owner_id;
                             // delete groupObject.__v;
-
+                            const groupObject = groups[groupDataArr].toObject()
                             groupObject.currentUser = req.user._id;
+                           
+
                             ToBeInserted.data.push({ groupObject })
 
 
@@ -327,28 +355,30 @@ exports.getJoinedPublicGroups = async (req, res) => {
 exports.updateGroupImage = async (req, res) => {
     try {
 
-        s3Config.uploadFile(req.body.image, req.body.groupid+"_"+req.user._id,CONSTANT.GroupProfilePictureBucketName)
-    .then(async picLocation => {
+        s3Config.uploadFile(req.body.image, req.body.groupid + "_" + req.user._id, CONSTANT.GroupProfilePictureBucketName)
+            .then(async picLocation => {
 
-        var GroupID = req.body.groupid;
-        var userVerified = await groupModel.findOneAndUpdate({
-            _id: GroupID,
-        },{$set:{image: picLocation}});
-        const filename = userVerified.image.split('/').slice(-1)[0];
-        s3Config.removeFileFromS3(filename, CONSTANT.GroupProfilePictureBucketName, function(err, res){
-            if(err){
-                console.log("Unable to delete older image from S3.");
-            } else {
-                console.log("Removed older image from S3 successfully.");
-            }
-        });
-        res.status(200).send("Image Uploaded successfully");
-        console.log(userVerified);
-    })
-    .catch(function(e){
-       console.log("Failed to upload profile pic", e);
-        res.status(400).send({error:"Failed to upload profile pic" });
-    });
+                var GroupID = req.body.groupid;
+                var userVerified = await groupModel.findOneAndUpdate({
+                    _id: GroupID,
+                }, { $set: { image: picLocation } });
+
+                const filename = userVerified.image.split('/').slice(-1)[0];
+                     
+                s3Config.removeFileFromS3(filename, CONSTANT.GroupProfilePictureBucketName, function (err, res) {
+                    if (err) {
+                        console.log("Unable to delete older image from S3.");
+                    } else {
+                        console.log("Removed older image from S3 successfully.");
+                    }
+                });
+                res.status(200).send("Image Uploaded successfully");
+                console.log(userVerified);
+            })
+            .catch(function (e) {
+                console.log("Failed to upload profile pic", e);
+                res.status(400).send({ error: "Failed to upload profile pic" });
+            });
 
     } catch (err) {
         //console.log(err)
@@ -356,12 +386,15 @@ exports.updateGroupImage = async (req, res) => {
 
     }
 
-   
+
 }
 
 
 exports.updateGroupinformation = async (req, res) => {
     try {
+
+         if(req.body.group_type==="public"){
+         
         var categoryData = await CategoryModel.findOne({ _id: req.body.GroupCategory_id });
         var GroupID = req.body.groupid;
 
@@ -375,7 +408,22 @@ exports.updateGroupinformation = async (req, res) => {
             _id: GroupID,
         }, { $set: { GroupName, group_Bio, privacy, GroupCategory_id, GroupCategory } });
         res.status(200).send("Image Uploaded successfully");
+    }
+    else{
 
+     
+        var GroupID = req.body.groupid;
+
+        var GroupName = req.body.GroupName;
+        var group_Bio = req.body.group_Bio;
+     
+
+        var userVerified = await groupModel.update({
+            _id: GroupID,
+        }, { $set: { GroupName, group_Bio  } });
+        res.status(200).send("Image Uploaded successfully");
+
+    }
         // //console.log("Failed to upload profile pic", e);   
 
     } catch (err) {
@@ -416,7 +464,7 @@ exports.AdmindeleteUserfromtheGroup = async (req, res) => {
 
 
 
-       
+
 exports.DismissUserAsAdmin = async (req, res) => {
     try {
 
@@ -543,23 +591,49 @@ exports.leaveGroup = async (req, res) => {
     }
 }
 
+exports.getJoinedPrivateGroups = async (req, res) => {
 
+    try {
 
+        var data = await req.user.populate({ path: 'group' }).execPopulate();
+        var groupData = data.group;
+
+        var response = []
+        for (var data in groupData) {
+
+            if (groupData[data].group_type.trim() === 'private') {
+              
+                groupData[data].countMembers = await UserModel.countDocuments({ "joined_groups.groupid": groupData[data]._id, });
+                const groupObject = groupData[data].toObject()
+                groupObject.currentUser = req.user._id;
+
+                response.push(groupObject)
+            }
+
+        }
+
+        res.status(200).json({ message: "Joined Groups : ", result: response });
+
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({ message: err });
+    }
+}
 
 
 // exports.getJoinedPrivateGroups = async (req, res) => {
 //     try {
 
 //         var Response = []
-        
-      
+
+
 
 //         if (req.user.joined_groups.length !== 0) {
 
 //                     for (var groupid in req.user.joined_groups) {
 
 //                         const groupData = await groupModel.findOne({ _id: req.user.joined_groups[groupid].groupid });
-                         
+
 //                         // const isPresent = groupData.owner_id.toString()===req.user._id?true:false;//groupData.owner_id.filter((a) => a.toString() === req.user._id.toString());
 //                         // console.log(ToBeInserted.data,"sssssssssss")
 //                         //if (isPresent.length === 0) {
@@ -587,16 +661,17 @@ exports.leaveGroup = async (req, res) => {
 //                         Response.push(ToBeInserted)
 //                     }
 
-//                 }
 
-            
+
+
 //         }
 
 
 //         res.status(200).json({ message: "Joined Groups : ", result: Response });
 
-//     } catch (err) {
+//     }catch (err) {
 //         console.log(err)
 //         res.status(400).json({ message: err });
 //     }
+
 // }

@@ -138,6 +138,11 @@ router.get('/getAllPublicJoinedPostofGroup', auth, function (req, res) {
 });
 
 
+// router.post('/getAllPersonalPostofGroup', auth, function (req, res) {
+
+//     postObj.getAllPersonalPostofGroup(req, res);
+
+// });
 
 
 module.exports = router;

@@ -110,4 +110,9 @@ router.post('/leaveGroup', auth,function(req, res){
 });
 
 
+router.get('/getJoinedPrivateGroups', auth,function(req, res){
+    //console.log("****req.body.password", req.body.password);
+    groupsObj.getJoinedPrivateGroups(req,res);
+});
+
 module.exports = router;
