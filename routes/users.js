@@ -70,4 +70,21 @@ router.post('/updateUserImage',auth, function(req, res){
 });
 
 
+router.post('/updateUserinformation',auth, function(req, res){
+    //console.log("****User data");
+    userObj.updateUserinformation(req,res);
+});
+
+
+router.post('/updateUserPassword',auth, function(req, res){
+    //console.log("****req.body.password", req.body.password);
+
+    bcrypt.hash(req.body.password, CONSTANT.BCRYPT_SALT, (err, encrypted) => {
+        //console.log("****req.body.password", req.body.password);
+        //console.log("****encrypted", encrypted);
+        req.body.password = encrypted
+        userObj.updateUserPassword(req, res);
+    });
+});
+
 module.exports = router;

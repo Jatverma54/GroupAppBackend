@@ -250,6 +250,14 @@ exports.getJoinedPublicGroups = async (req, res) => {
         var groupData = Gdata.createdgroup;
 
         groupData = groupData.filter(a => a.group_type.toString() === "public")
+        // UserModel.aggregate ([{ $match: { isActive: true } }, 
+        //     { $unwind: "$joined_groups" }, 
+        //     { $group: { _id: "$joined_groups", joined_groupsid: { $addToSet: ["5f7ca461e90194533c8ee52f"] } } }, 
+        //     { $unwind:"$joined_groups" }, 
+        //     { $group : {_id : "$joined_groups.groupid", countMembers : {$sum : 1} } }
+        //     ],function(err, res){
+        //     console.log(res)
+        //     })
 
         if (req.user.created_groups.length !== 0 && groupData.length !== 0) {
 
@@ -261,7 +269,7 @@ exports.getJoinedPublicGroups = async (req, res) => {
 
                 // const groupData = await groupModel.findOne({ _id: req.user.created_groups[data].groupid });
                 // //console.log(groupData)
-                groupData[data].countMembers = await UserModel.countDocuments({ "joined_groups.groupid": groupData[data]._id, });
+               groupData[data].countMembers = await UserModel.countDocuments({ "joined_groups.groupid": groupData[data]._id, });
 
                 const groupObject = groupData[data].toObject()
                 //  delete groupObject.GroupCategory_id;

@@ -4,6 +4,7 @@ const sendEmail = require('./../common/mailer_config');
 const uploadFile = require('./../common/s3_bucket_config');
 const CONSTANT = require('./../common/constant');
 const s3Config = require('./../common/s3_bucket_config');
+const bcrypt = require('bcrypt');
 exports.addUser = function (req, res, next) {
     try {
         // uploadFile("C:/Users/snagdeote/Desktop/New folder/Groupapp_project/develop/images/promo-image.jpg", req.body.username)
@@ -150,7 +151,7 @@ exports.updateUserImage = async (req, res) => {
                         console.log("Removed older image from S3 successfully.");
                     }
                 });
-                res.status(200).send("Image Uploaded successfully");
+                res.status(200).send({result:req.user});
                // console.log(userVerified);
             })
             .catch(function (e) {
@@ -165,4 +166,63 @@ exports.updateUserImage = async (req, res) => {
     }
 
 
+}
+
+
+
+exports.updateUserinformation = async (req, res) => {
+    try {
+       var username= req.body.username;
+       var full_name= req.body.full_name;
+      
+        var userVerified = await UserModel.update({
+            _id: req.user._id,
+        }, { $set: { username, "profile.full_name":full_name } });
+        res.status(200).send({result:req.user});
+ 
+        // //console.log("Failed to upload profile pic", e);   
+
+    } catch (err) {
+      //  console.log(err,"error")  
+         if (err.errmsg.includes(username)) {
+            res.status(400).send({ error: "Username already exist" });
+        }
+        res.status(400).send({ error: "Something went wrong!! Please try again" });
+     
+    }
+}
+
+
+
+exports.updateUserPassword =  (req, response) => {
+    try {
+
+        bcrypt.compare(req.body.currentPassword, req.user.password, async function(err, res) {
+            if (err){
+                console.log(err," res error")  
+             return   response.status(400).send({ error: "Something went wrong!! Please try again" });
+            }
+            if (res){
+              
+                var password= req.body.password;
+          
+                var userVerified = await UserModel.update({
+                    _id: req.user._id,
+                }, { $set: { password} });
+                response.status(200).send("Password updated successfully");
+               
+            } else {
+                
+              // response is OutgoingMessage object that server response http request
+              return response.status(400).send({success: false, message: 'Current Password do not match'});
+            }
+          });
+      
+        // //console.log("Failed to upload profile pic", e);   
+
+    } catch (err) {
+       console.log(err,"error")  
+      response.status(400).send({ error: "Something went wrong!! Please try again" });
+     
+    }
 }

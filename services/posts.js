@@ -565,6 +565,7 @@ exports.getAllPublicJoinedPostofGroup = async (req, res) => {
 
             const group = await groupModel.findById(req.user.joined_groups[data].groupid);
 
+           if(group.group_type==='public'){
             await group.populate({ path: 'posts', options: { sort: { time: -1 } } }).execPopulate();
             var postData = group.posts;
             // const userData = await UserModel.findById(postdata[0].OnwerId);
@@ -598,7 +599,7 @@ exports.getAllPublicJoinedPostofGroup = async (req, res) => {
 
                 postdataObjectArray.push(postdataObject)
             }
-           
+        }
         }
       
         res.status(200).json({ message: "User as Admin: ", result: postdataObjectArray });
