@@ -226,3 +226,73 @@ exports.updateUserPassword =  (req, response) => {
      
     }
 }
+
+
+
+exports.userSearchQuery = async (req, res) => {
+
+    try {
+  
+        UserModel.aggregate(
+            [
+                // Match first to reduce documents to those where the array contains the match
+                // { "$match": {
+                //     "username": { "$regex": req.body.userSearchQuery, "$options": "i" }
+                // }},
+                { "$match": {
+                    "profile.full_name": { "$regex": req.body.userSearchQuery, "$options": "i" }
+                }},
+
+                
+             //   Group back as an array with only the matching elements
+                { "$group": {
+                    "_id": "$_id",
+                    "username": { "$first": "$username" },
+                    "name": { "$first": "$profile.full_name" },
+                    "image": { "$first": "$profile.profile_pic" },
+                }}
+            ],
+            function(err,results) {
+                if(err){
+                    console.log(err)
+                    res.status(400).json({ message: err });
+                }else{
+                   console.log(results)
+                    res.status(200).json({ message: "Searched Users : ", result: results });
+                }
+            }
+        )
+        
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({ message: err });
+    }
+}
+
+
+
+
+exports.adduserTogroup = async (req, res) => {
+
+    try {
+        // const groupData = await groupModel.findById(req.body._id);
+
+        for(var data in req.body.SelectedUsers){
+        const UserData = await UserModel.findById(req.body.SelectedUsers[data]._id);
+       
+      
+        if(!(UserData.joined_groups.find(a=>a.groupid.toString()===req.body.groupid))){
+
+            UserData.joined_groups = UserData.joined_groups.concat({ groupid: req.body.groupid})//name: result.GroupName,GroupCategoryid: req.body.GroupCategory_id 
+            await UserData.save()
+        }
+    
+        }
+        res.status(200).json({ message: "Users added to group" });
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({ message: err });
+    }
+
+
+}

@@ -87,4 +87,18 @@ router.post('/updateUserPassword',auth, function(req, res){
     });
 });
 
+
+
+router.post('/userSearchQuery',auth, function(req, res){
+    //console.log("****User data");
+    userObj.userSearchQuery(req,res);
+});
+
+
+router.post('/adduserTogroup',auth, function(req, res){
+    //console.log("****User data");
+    userObj.adduserTogroup(req,res);
+});
+
+
 module.exports = router;

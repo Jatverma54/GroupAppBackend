@@ -115,4 +115,11 @@ router.get('/getJoinedPrivateGroups', auth,function(req, res){
     groupsObj.getJoinedPrivateGroups(req,res);
 });
 
+
+router.post('/groupSearchQuery', auth,function(req, res){
+    //console.log("****req.body.password", req.body.password);
+    groupsObj.groupSearchQuery(req,res);
+});
+
+
 module.exports = router;

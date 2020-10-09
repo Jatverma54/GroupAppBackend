@@ -22,7 +22,8 @@ var UserModelSchema = new mongoose.Schema({
     joined_groups: [{
         groupid: {
             type: Schema.Types.ObjectId,  
-            ref: 'groupModel'       
+            ref: 'groupModel',
+              
         },
         name:{
             type: String,

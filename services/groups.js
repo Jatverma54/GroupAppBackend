@@ -7,6 +7,7 @@ var postModel = require('./../model/posts');
 
 const CONSTANT = require('./../common/constant');
 const { response } = require('express');
+const { compareSync } = require('bcrypt');
 
 
 exports.addNewGroup = async (req, res, next) => {
@@ -683,3 +684,58 @@ exports.getJoinedPrivateGroups = async (req, res) => {
 //     }
 
 // }
+
+
+exports.groupSearchQuery = async (req, res) => {
+
+    try {
+  
+        groupModel.aggregate(
+            [
+                // Match first to reduce documents to those where the array contains the match
+                { "$match": {
+                    "GroupName": { "$regex": req.body.groupSearchQuery, "$options": "i" }
+                }},
+        
+                // Unwind to "de-normalize" the document per array element
+                // { "$unwind": "$authors" },
+        
+                // Now filter those document for the elements that match
+                { "$match": {
+                    "group_type": 'public'
+                }},
+        
+            
+        
+        
+                // Group back as an array with only the matching elements
+                // { "$group": {
+                //     "_id": "$_id",
+                //     "GroupCategory": { "$first": "$GroupCategory" },
+                //     "GroupName": { "$first": "$GroupName" },
+                //     "groupIcon": { "$first": "$image" },
+                // }}
+            ],
+            function(err,results) {
+                if(err){
+                    console.log(err)
+                    res.status(400).json({ message: err });
+                }else{
+                  //  console.log(results)
+
+                  for (var data in results) {
+                
+                    results[data].isJoined = req.user.joined_groups.find(a => a.groupid.toString() === results[data]._id.toString()) ? true : false;
+                  
+                }
+                    res.status(200).json({ message: "Joined Groups : ", result: results });
+                }
+            }
+        )
+        
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({ message: err });
+    }
+}
+
