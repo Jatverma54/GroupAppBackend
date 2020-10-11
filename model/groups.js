@@ -15,14 +15,14 @@ var groupModelSchema = new Schema({
     owner_id: {type:Schema.Types.ObjectId,required:true, },//ref: 'UserModel'
     admin_id: [{type:Schema.Types.ObjectId,required:true}],
     image: { type: String,default:null},
-    groupCreateddate: { type: Date,  default: Date() },
+    groupCreateddate: { type: Date,  default:new Date() },
     post:[Object],
     GroupAdminName:[{type: String}], 
     isJoined:{ type: Boolean},
    // RequestedBy: [{type:Schema.Types.ObjectId}],
    isRequested:{ type: Boolean},
   countMembers:{type:Number},
-LastUpdated: { type: Date,  default:  Date() },
+LastUpdated: { type: Date,  default:new  Date() },
 });
 
 groupModelSchema.virtual('posts', {

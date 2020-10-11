@@ -3,7 +3,8 @@ var constants = {
     ADMIN_EMAIL: 'snehal.nagdeote@gmail.com',
     PlaceholderImageUrl:"https://groupappproject.s3-us-west-2.amazonaws.com/PlaceholderImage.png",
     ProfilePictureBucketName:'groupappproject/ProfilePictures',
-    GroupProfilePictureBucketName:'groupappproject/GroupProfilePicture'
+    GroupProfilePictureBucketName:'groupappproject/GroupProfilePicture',
+   PostMediaBucketName:'groupappproject/PostMedia'
 }
 
 module.exports = constants;

@@ -6,39 +6,68 @@ var postModel = require('./../model/posts');
 const uploadFile = require('./../common/s3_bucket_config_BulkImages');
 const CONSTANT = require('./../common/constant');
 const User = require('./../model/users');
-
+const s3Config = require('./../common/s3_bucket_config');
 
 exports.addNewPost = async (req, res, next) => {
     try {
 
         // console.log(categoryData,"sssssssssssssssssssssssssss")
         // console.log("req.body",file);
-        if (req.body.image.length != 0 || req.body.video || req.body.document) {
-            console.log("req.body", req.body.video);
-            uploadFile(req.body.video, req.body.GroupId, CONSTANT.GroupProfilePictureBucketName)
-                .then(picLocation => savePostInDB(req, res, picLocation))
-                .catch(function (e) {
-                    //console.log("Failed to upload profile pic", e);
+        //changed
+        // if (req.body.image.length != 0 || req.body.video || req.body.document) {
+        //     console.log("req.body", req.body.video);
+        //     uploadFile(req.body.video, req.body.GroupId, CONSTANT.GroupProfilePictureBucketName)
+        //         .then(picLocation => savePostInDB(req, res, picLocation))
+        //         .catch(function (e) {
+        //             //console.log("Failed to upload profile pic", e);
 
-                    res.status(400).send({ error: "Failed to upload profile pic" });
-                });
+        //             res.status(400).send({ error: "Failed to upload profile pic" });
+        //         });
 
+        // }
+        // else {
+        //     savePostInDB(req, res)
+        // }
+        
+        if(req.body.content==="video"){
+            req.body.video = req.files[0].location;
         }
-        else {
-            savePostInDB(req, res)
+        else if (req.body.content==="document"){
+            req.body.document = req.files[0].location;
         }
+        else if (req.body.content==="image"){
+            console.log(req.files)
+             var ImagesUrl=[]
+             var imagesobject=req.files;
+for(var data in imagesobject){
+    ImagesUrl.push(imagesobject[data].location)
+
+    req.body.image=ImagesUrl;
+}
+           
+        }
+
+        savePostInDB(req, res)
     } catch (err) {
         console.log(err)
         res.status(500).send({ error: "Category is not present in DB" });
     }
 }
 
-function savePostInDB(req, res, picLocation, categoryData) {
+function savePostInDB(req, res,) {
 
     try {
+       
         req.body.OnwerName = req.user.profile.full_name;
         req.body.OnwerProfilePic = req.user.profile.profile_pic;
 
+        // req.body.GroupId = req.body.GroupId;
+        // req.body.postMetaData =req.body.postMetaData;
+        // req.body.OnwerId = req.body.OnwerId;
+        // req.body.createdAt = req.body.createdAt;
+        
+        
+        
         var PostData = new postModel(req.body);
 
 
@@ -55,7 +84,7 @@ function savePostInDB(req, res, picLocation, categoryData) {
             } else {
 
                 res.status(201).send({ message: "Data saved successfully.", result, })
-                console.log(result, "Resultttttttttt")
+                //console.log(result, "Resultttttttttt")
             }
 
 
@@ -71,7 +100,7 @@ function savePostInDB(req, res, picLocation, categoryData) {
 exports.getAllPostofGroup = async (req, res) => {
     try {
         const group = await groupModel.findById(req.body.groupId);
-
+      
         await group.populate({ path: 'posts', options: { sort: { time: -1 } } }).execPopulate();
         var postData = group.posts;
         // const userData = await UserModel.findById(postdata[0].OnwerId);
@@ -86,6 +115,11 @@ exports.getAllPostofGroup = async (req, res) => {
             postdataObject.isLiked = postData[data].likedBy.find(a => a.toString() === req.user._id.toString()) ? true : false;
             postdataObject.currentUser = req.user._id;
             postdataObject.currentUserPic = req.user.profile.profile_pic;
+          //To Be Changed
+            var userData=await UserModel.findById(postdataObject.OnwerId);
+            postdataObject.OnwerProfilePic = userData.profile.profile_pic;
+            postdataObject.OnwerName = req.user.profile.full_name;
+
             // postdataObject.currentUser = req.user._id;
             let toBeInserted = [];
             if (postData[data].likedBy.length !== 0) {
@@ -133,6 +167,12 @@ exports.getAllUserPostofGroup = async (req, res) => {
             postdataObject.isLiked = postData[data].likedBy.find(a => a.toString() === req.user._id.toString()) ? true : false;
             postdataObject.currentUser = req.user._id;
             postdataObject.currentUserPic = req.user.profile.profile_pic;
+
+    //To Be Changed
+    var userData=await UserModel.findById(postdataObject.OnwerId);
+    postdataObject.OnwerProfilePic = userData.profile.profile_pic;
+    postdataObject.OnwerName = req.user.profile.full_name;
+
             let toBeInserted = [];
             if (postData[data].likedBy.length !== 0) {
 
@@ -256,7 +296,7 @@ exports.addNewComment = async (req, res) => {
 
         var PostData = await postModel.findById(req.body.postId)
 
-        PostData.Comments = PostData.Comments.concat({ comment: comment, LikedBy: [], OnwerId: req.user._id, createdAt: Date() })//name: result.GroupName,
+        PostData.Comments = PostData.Comments.concat({ comment: comment, LikedBy: [], OnwerId: req.user._id, createdAt:new Date() })//name: result.GroupName,
 
         PostData.save();
         res.status(200).send("Comments updated successfully");
@@ -457,7 +497,7 @@ exports.addNewReplyComment = async (req, res) => {
 
         var commentData = PostData.Comments.find(id => id._id.toString() === req.body.commentId)
 
-        commentData.ReplyComment = commentData.ReplyComment.concat({ comment: comment, LikedBy: [], OnwerId: req.user._id, createdAt: Date() })//name: result.GroupName,
+        commentData.ReplyComment = commentData.ReplyComment.concat({ comment: comment, LikedBy: [], OnwerId: req.user._id, createdAt:new Date() })//name: result.GroupName,
 
         PostData.save();
         res.status(200).send("Reply Comments updated successfully");
@@ -584,6 +624,12 @@ exports.getAllPublicJoinedPostofGroup = async (req, res) => {
                 postdataObject.currentUser = req.user._id;
                 postdataObject.currentUserPic = req.user.profile.profile_pic;
                 // postdataObject.currentUser = req.user._id;
+
+    //To Be Changed
+    var userData=await UserModel.findById(postdataObject.OnwerId);
+    postdataObject.OnwerProfilePic = userData.profile.profile_pic;
+    postdataObject.OnwerName = req.user.profile.full_name;
+
                 let toBeInserted = [];
                 if (postData[data].likedBy.length !== 0) {
 
@@ -660,4 +706,17 @@ exports.getAllPublicJoinedPostofGroup = async (req, res) => {
 //         res.status(400).json({ message: err });
 //     }
 
+// }
+
+
+// exports.uploadMultipleImages = async (req, res, next) => {
+//     try {
+
+//         // console.log(categoryData,"sssssssssssssssssssssssssss")
+//         // console.log("req.body",file);
+//       // console.log(req)
+//     } catch (err) {
+//         console.log(err)
+//         res.status(500).send({ error: "Category is not present in DB" });
+//     }
 // }

@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var groupModel = require('./groups');
+
 //Define a schema
 var Schema = mongoose.Schema;
 
@@ -17,7 +18,7 @@ var PostModelSchema = new Schema({
   postMetaData: { type: String, },
 
   OnwerId: {
-    type: String, required: true,
+    type: String,
     ref: 'UserModel'
   },
 
@@ -35,7 +36,7 @@ var PostModelSchema = new Schema({
     OnwerId: {
       type: Schema.Types.ObjectId,
     },
-    createdAt: { type: Date, default: Date() },
+    createdAt: { type: Date, default: new Date()  },
     ReplyComment: [
 
       {
@@ -45,13 +46,13 @@ var PostModelSchema = new Schema({
         OnwerId: {
           type: Schema.Types.ObjectId,
         },
-        createdAt: { type: Date, default: Date() }
+        createdAt: { type: Date, default:new Date() }
       }]
 
   }], //text, commented_by, date
   time: { type: Date, default:  Date.now() },
   GroupId: {
-    type: Schema.Types.ObjectId, required: true,
+    type: Schema.Types.ObjectId, 
     ref: 'groupModel'
   },
 
@@ -65,7 +66,7 @@ PostModelSchema.pre('save', async function preSave(next){
   if (this.isNew){
     var userVerified = await groupModel.update({
       _id: something.GroupId,
-  }, { $set: { LastUpdated: Date() } });
+  }, { $set: { LastUpdated:new Date() } });
   }
  
   next();

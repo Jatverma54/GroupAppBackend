@@ -48,7 +48,7 @@ exports.uploadFile = (fileName, userName,BUCKET_NAME) => {
             ACL:'public-read',
             ContentEncoding: 'base64',
             ContentType: mime
-
+              
         };
 
         // Uploading files to the bucket

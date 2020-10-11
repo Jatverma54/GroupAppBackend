@@ -5,11 +5,10 @@ const bcrypt = require('bcrypt');
 var groupsObj = require('./../services/groups');
 var postObj = require('./../services/posts');
 const auth = require('../middleware/auth')
+const upload = require('../middleware/multer')
 const CONSTANT = require('../common/constant');
 
-router.post('/createNewPost', auth, function (req, res) {
-
-
+router.post('/createNewPost/', auth,[upload.array('file')], function (req, res) {
 
     postObj.addNewPost(req, res);
 
@@ -17,8 +16,6 @@ router.post('/createNewPost', auth, function (req, res) {
 
 
 router.post('/getAllPostofGroup', auth, function (req, res) {
-
-
 
     postObj.getAllPostofGroup(req, res);
 
@@ -136,6 +133,14 @@ router.get('/getAllPublicJoinedPostofGroup', auth, function (req, res) {
     postObj.getAllPublicJoinedPostofGroup(req, res);
 
 });
+
+// router.post('/uploadMultipleImages/',auth,[upload.array('files')], function (req, res,next) {
+
+
+//   res.send("success")
+//   //  postObj.uploadMultipleImages(req, res);
+
+// });
 
 
 // router.post('/getAllPersonalPostofGroup', auth, function (req, res) {
