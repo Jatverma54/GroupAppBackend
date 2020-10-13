@@ -32,6 +32,13 @@ groupModelSchema.virtual('posts', {
 })
 
 
+groupModelSchema.virtual('groupList', {
+  ref: 'UserModel',
+ 
+  foreignField: 'joined_groups.groupid',
+  localField: '_id'
+  
+})
 
 
 

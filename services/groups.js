@@ -100,12 +100,16 @@ exports.getPublicGroupsWithCategory = async (req, res) => {
     try {
 
         var groupData = await groupModel.find({ group_type: "public", GroupCategory_id: req.body.GroupCategory_id });
-
+        
+     
         for (var data in groupData) {
             groupData[data].isRequested = req.user.Requested_groups.find(a => a.groupid.toString() === groupData[data]._id.toString()) ? true : false;
             groupData[data].isJoined = req.user.joined_groups.find(a => a.groupid.toString() === groupData[data]._id.toString()) ? true : false;
-            groupData[data].countMembers = await UserModel.countDocuments({ "joined_groups.groupid": groupData[data]._id });
-
+           var count  = await groupData[data].populate('groupList').execPopulate();
+             groupData[data].countMembers=count.groupList.length;
+            //await UserModel.countDocuments({ "joined_groups.groupid": groupData[data]._id });
+           
+           
         }
 
         res.status(200).json({ message: "Data: ", result: groupData });
@@ -270,7 +274,10 @@ exports.getJoinedPublicGroups = async (req, res) => {
 
                 // const groupData = await groupModel.findOne({ _id: req.user.created_groups[data].groupid });
                 // //console.log(groupData)
-               groupData[data].countMembers = await UserModel.countDocuments({ "joined_groups.groupid": groupData[data]._id, });
+                var count  = await groupData[data].populate('groupList').execPopulate();
+                groupData[data].countMembers=count.groupList.length;
+             
+               //await UserModel.countDocuments({ "joined_groups.groupid": groupData[data]._id, });
 
                 const groupObject = groupData[data].toObject()
                 //  delete groupObject.GroupCategory_id;
@@ -321,8 +328,11 @@ exports.getJoinedPublicGroups = async (req, res) => {
 
                         if (groups[groupDataArr].owner_id.toString() !== req.user._id.toString()) {
 
-
-                            groups[groupDataArr].countMembers = await UserModel.countDocuments({ "joined_groups.groupid": groups[groupDataArr]._id, });
+                            var count  = await groups[groupDataArr].populate('groupList').execPopulate();
+                            groups[groupDataArr].countMembers=count.groupList.length;
+                         
+                            //   groups[groupDataArr].countMembers =
+                            // await UserModel.countDocuments({ "joined_groups.groupid": groups[groupDataArr]._id, });
 
 
                             //const groupObject = groupData
@@ -612,7 +622,12 @@ exports.getJoinedPrivateGroups = async (req, res) => {
 
             if (groupData[data].group_type.trim() === 'private') {
               
-                groupData[data].countMembers = await UserModel.countDocuments({ "joined_groups.groupid": groupData[data]._id, });
+               // groupData[data].countMembers = await UserModel.countDocuments({ "joined_groups.groupid": groupData[data]._id, });
+               var count  = await groupData[data].populate('groupList').execPopulate();
+               groupData[data].countMembers=count.groupList.length;
+              
+              
+              
                 const groupObject = groupData[data].toObject()
                 groupObject.currentUser = req.user._id;
 

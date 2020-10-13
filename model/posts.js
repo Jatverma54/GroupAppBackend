@@ -27,15 +27,13 @@ var PostModelSchema = new Schema({
   OnwerProfilePic: { type: String },
 
   like_count: Number,
-  likedBy: [Schema.Types.ObjectId],
+  likedBy: [{type:Schema.Types.ObjectId, ref: 'UserModel'}],
 
   Comments: [{
     comment: { type: String },
     LikedBy:
-      [Schema.Types.ObjectId],
-    OnwerId: {
-      type: Schema.Types.ObjectId,
-    },
+    [{type:Schema.Types.ObjectId, ref: 'UserModel'}],
+     OnwerId: {type:Schema.Types.ObjectId, ref: 'UserModel'},
     createdAt: { type: Date, default: new Date()  },
     ReplyComment: [
 
@@ -43,9 +41,8 @@ var PostModelSchema = new Schema({
         comment: { type: String },
         LikedBy:
           [Schema.Types.ObjectId],
-        OnwerId: {
-          type: Schema.Types.ObjectId,
-        },
+        OnwerId: {type:Schema.Types.ObjectId, ref: 'UserModel'},
+
         createdAt: { type: Date, default:new Date() }
       }]
 

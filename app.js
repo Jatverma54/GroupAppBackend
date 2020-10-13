@@ -9,6 +9,7 @@ const usersRouter = require('./routes/users');
 const adminRouter = require('./routes/admin');
 const groupRouter = require('./routes/groups');
 const groupPostRouter = require('./routes/posts');
+const notificationRouter = require('./routes/Notification');
 const bodyParser =require('body-parser');
 const connection = require('./common/connection');
 const app = express();
@@ -32,6 +33,7 @@ app.use('/users', usersRouter);
 app.use('/admin', adminRouter);
 app.use('/groups', groupRouter);
 app.use('/groupPost', groupPostRouter);
+app.use('/notifications', notificationRouter);
 
 // app.use(bodyParser.json({limit: '200mb',extended: true}));
 // app.use(bodyParser.urlencoded({limit: '200mb', parameterLimit: 200000,extended: true}));

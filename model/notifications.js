@@ -5,11 +5,15 @@ var Schema = mongoose.Schema;
 
 var NotificationModelSchema = new Schema({
     message: String,
-    group_id: Schema.Types.ObjectId,
-    activity_by: Schema.Types.ObjectId,
+    group_id: {type:Schema.Types.ObjectId,ref:'groupModel'},
+    activity_by: {type:Schema.Types.ObjectId, ref:'UserModel'},
     activity: String, 
-    post_id: Schema.Types.ObjectId,
-    date: Date
+    post_id: {type:Schema.Types.ObjectId, ref:'postModel'},
+    Createddate:{type: Date, default: new Date()},
+    notificationType:String,
+    read:{type:Boolean,default:false}
 });
 
-exports.module = mongoose.model('NotificationModel', NotificationModelSchema );
+ 
+const NotificationModel = mongoose.model('NotificationModel', NotificationModelSchema );
+module.exports = NotificationModel
