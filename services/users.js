@@ -31,10 +31,10 @@ function saveUserInDB(req, res, picLocation) {
     UserData.save((err, result) => {
         if (err) {
             //console.log("*****err", err);
-            if (err.errors.email !== undefined) {
+            if (err.errors&&err.errors.email !== undefined) {
                 res.status(400).send({ error: "Email Id already exist" })
             }
-            else if (err.errors.username !== undefined) {
+            else if (err.errors&&err.errors.username !== undefined) {
                 res.status(400).send({ error: "Username already exist" });
             }
         } else {
@@ -151,7 +151,11 @@ exports.updateUserImage = async (req, res) => {
                         console.log("Removed older image from S3 successfully.");
                     }
                 });
-                res.status(200).send({result:req.user});
+
+                var userData=await UserModel.findById(UserId);
+        
+                res.status(200).send({result:userData});
+               
                // console.log(userVerified);
             })
             .catch(function (e) {
@@ -178,13 +182,16 @@ exports.updateUserinformation = async (req, res) => {
         var userVerified = await UserModel.update({
             _id: req.user._id,
         }, { $set: { username, "profile.full_name":full_name } });
-        res.status(200).send({result:req.user});
+      
+      var userData=await UserModel.findById(req.user._id);
+        
+        res.status(200).send({result:userData});
  
         // //console.log("Failed to upload profile pic", e);   
 
     } catch (err) {
       //  console.log(err,"error")  
-         if (err.errmsg.includes(username)) {
+         if (err.errmsg&&err.errmsg.includes(username)) {
             res.status(400).send({ error: "Username already exist" });
         }
         res.status(400).send({ error: "Something went wrong!! Please try again" });

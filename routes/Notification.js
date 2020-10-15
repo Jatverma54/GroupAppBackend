@@ -16,5 +16,14 @@ router.get('/:id', auth,function(req, res){
 });
 
 
+router.get('/', auth,function(req, res){
+  
+   
+    //console.log("****req.body of createNewGroup", req.body);
+    notificationObj.getAllNotification(req, res);
+  
+});
+
+
 
 module.exports = router;

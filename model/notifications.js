@@ -11,7 +11,9 @@ var NotificationModelSchema = new Schema({
     post_id: {type:Schema.Types.ObjectId, ref:'postModel'},
     Createddate:{type: Date, default: new Date()},
     notificationType:String,
-    read:{type:Boolean,default:false}
+    comment_id: {type:Schema.Types.ObjectId, ref:'postModel'},
+    read:{type:Boolean,default:false},
+    Replycomment_id: {type:Schema.Types.ObjectId, ref:'postModel'},
 });
 
  

@@ -221,7 +221,7 @@ exports.getAllUserPostofGroup = async (req, res) => {
 exports.deleteData = async (req, res) => {
     try {
         const RemovedData = await postModel.remove({ _id: req.params.id });
-        const RemoveNotification= await NotificationModel.remove({post_id:req.params.id})
+        const RemoveNotification= await NotificationModel.deleteMany({post_id:req.params.id})
 
         res.status(200).json({ message: "Removed Group: ", result: RemovedData });
     } catch (err) {
@@ -235,7 +235,7 @@ exports.deleteDataAndUserfromGroup = async (req, res) => {
     try {
         const RemovedData = await postModel.remove({ _id: req.body.postId });
 
-         const RemoveNotification= await NotificationModel.remove({post_id:req.body.postId})
+         const RemoveNotification= await NotificationModel.deleteMany({post_id:req.body.postId})
 
         const userdata = await UserModel.findOne({ _id: req.body.userId });
 
@@ -268,8 +268,24 @@ exports.like = async (req, res) => {
 
         if (req.body.isLiked) {
             PostData.likedBy.push(req.user._id);
+
+            var notify = {
+
+                group_id: PostData.GroupId,
+                activity_by: req.user._id,
+                activity: "PostLikedBy",
+                post_id: PostId,
+                notificationType: "UserSpecific"
+               
+            }
+            var notificationData = new NotificationModel(notify);
+            notificationData.save();
+
         } else {
             PostData.likedBy = PostData.likedBy.filter(a => a.toString() !== req.user._id.toString())
+
+            const RemoveNotification= await NotificationModel.remove({post_id:PostId, activity_by: req.user._id, activity: "PostLikedBy"})
+           
         }
 
         PostData.save();
@@ -322,6 +338,21 @@ exports.addNewComment = async (req, res) => {
         PostData.Comments = PostData.Comments.concat({ comment: comment, LikedBy: [], OnwerId: req.user._id, createdAt: new Date() })//name: result.GroupName,
 
         PostData.save();
+
+
+
+        var notify = {
+
+            group_id: PostData.GroupId,
+            activity_by: req.user._id,
+            activity: "CommentBy",
+            post_id: req.body.postId,
+            notificationType: "UserSpecific",
+            comment_id:req.body.commentId
+           
+        }
+        var notificationData = new NotificationModel(notify);
+        notificationData.save();
         res.status(200).send("Comments updated successfully");
 
     } catch (err) {
@@ -389,8 +420,22 @@ exports.Commentslike = async (req, res) => {
 
         if (req.body.isLiked) {
             commentsData.LikedBy.push(req.user._id);
+
+            var notify = {
+
+                group_id: PostData.GroupId,
+                activity_by: req.user._id,
+                activity: "CommentLike",
+                post_id: req.body.postId,
+                notificationType: "UserSpecificComments",
+                comment_id:req.body.commentId
+            }
+            var notificationData = new NotificationModel(notify);
+            notificationData.save();
+
         } else {
             commentsData.LikedBy = commentsData.LikedBy.filter(a => a.toString() !== req.user._id.toString())
+            const RemoveNotification= await NotificationModel.remove({post_id:PostId,comment_id:req.body.commentId, activity_by: req.user._id, activity: "CommentLike"})
         }
 
         PostData.save();
@@ -446,7 +491,7 @@ exports.deleteComment = async (req, res) => {
         PostData.Comments = PostData.Comments.filter(id => id._id.toString() !== req.body.commentId)
 
         PostData.save();
-
+        const RemoveNotification= await NotificationModel.deleteMany({post_id:PostId, comment_id:req.body.commentId})
         res.status(200).send({ result: PostData });
 
     } catch (err) {
@@ -526,6 +571,21 @@ exports.addNewReplyComment = async (req, res) => {
         commentData.ReplyComment = commentData.ReplyComment.concat({ comment: comment, LikedBy: [], OnwerId: req.user._id, createdAt: new Date() })//name: result.GroupName,
 
         PostData.save();
+
+        var notify = {
+
+            group_id: PostData.GroupId,
+            activity_by: req.user._id,
+            activity: "RepliedOnComment",
+            post_id: req.body.postId,
+            notificationType: "UserSpecificComments",
+            comment_id:req.body.commentId
+        }
+        var notificationData = new NotificationModel(notify);
+        notificationData.save();
+
+
+
         res.status(200).send("Reply Comments updated successfully");
 
     } catch (err) {
@@ -547,11 +607,28 @@ exports.replyCommentslike = async (req, res) => {
 
         if (req.body.isLiked) {
             ReplycommentsData.LikedBy.push(req.user._id);
+            
+        var notify = {
+
+            group_id: PostData.GroupId,
+            activity_by: req.user._id,
+            activity: "RepliedOnCommentLike",
+            post_id: req.body.postId,
+            notificationType: "UserSpecificComments",
+            comment_id:req.body.commentId,
+            Replycomment_id:req.body.ReplycommentId
+        }
+        var notificationData = new NotificationModel(notify);
+        notificationData.save();
+        
         } else {
             ReplycommentsData.LikedBy = ReplycommentsData.LikedBy.filter(a => a.toString() !== req.user._id.toString())
         }
 
         PostData.save();
+
+
+
         res.status(200).send("Reply Comment Liked Array updated");
 
     } catch (err) {
