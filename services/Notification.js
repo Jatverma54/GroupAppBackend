@@ -57,19 +57,6 @@ exports.getNotification = async (req, res, next) => {
 
         res.status(200).send({ message: "Notifications", result: ToBeInserted })
 
-        //   if(PostData.image.length!==0){
-        //     notify.attachment=PostData.image[0];
-        //   }
-        //  else if(PostData.document){
-        //     notify.attachment=PostData.document;
-        // }
-        // else if(PostData.video){
-        //     notify.attachment=PostData.video;  
-        // }else{
-        //     notify.attachment=null;  
-        // }
-
-
     } catch (err) {
         console.log(err)
         res.status(500).send({ error: "Category is not present in DB" });
@@ -85,7 +72,7 @@ exports.getAllNotification = async (req, res, next) => {
         for (var data in req.user.joined_groups) {
 
 
-            var notificationData = await NotificationModel.find({ group_id:req.user.joined_groups[data].groupid  }).sort('-Createddate').exec()
+            var notificationData = await NotificationModel.find({ group_id:req.user.joined_groups[data].groupid  }).limit(50).sort('-Createddate').exec()
            
 
         for (var data in notificationData) {
@@ -132,19 +119,6 @@ exports.getAllNotification = async (req, res, next) => {
         }
     }
         res.status(200).send({ message: "Notifications", result: ToBeInserted })
-
-        //   if(PostData.image.length!==0){
-        //     notify.attachment=PostData.image[0];
-        //   }
-        //  else if(PostData.document){
-        //     notify.attachment=PostData.document;
-        // }
-        // else if(PostData.video){
-        //     notify.attachment=PostData.video;  
-        // }else{
-        //     notify.attachment=null;  
-        // }
-
    
     } catch (err) {
         console.log(err)
