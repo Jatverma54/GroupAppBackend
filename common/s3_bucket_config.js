@@ -83,14 +83,18 @@ exports.removeFileFromS3 = function(filename, BUCKET_NAME, callback) {
   }
   }
 
-  exports.removeMultipleFilesFromS3 = function(filenameObjects, BUCKET_NAME, callback) {
+  exports.removeMultipleFilesFromS3 = function(fileArr, BUCKET_NAME, callback) {
     //Input format
-    /*var filenameObjects = [];
-    for(var k in file){
-      filenameObjects.push({Key : file[k].fileName});
-    }*/
+    var filenameObjects = [];
+    var fileName = "";
+    for(var i = 0; i < fileArr.length; i++){
+      fileName = fileArr[i].split("/")[3]+"/"+fileArr[i].split("/")[4];
+      if(fileName){
+        filenameObjects.push({Key : fileName});
+      }
+    }
     var params = {
-      Bucket: BUCKET_NAME,
+      Bucket: "groupappproject",
       Delete: {
         Objects: filenameObjects
       }
@@ -100,6 +104,7 @@ exports.removeFileFromS3 = function(filename, BUCKET_NAME, callback) {
         console.log(err);
         callback(err, null);
       } else {
+        console.log(data)
         callback(null, true);
       }
     });

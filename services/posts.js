@@ -4,6 +4,8 @@ var CategoryModel = require('./../model/categories');
 var UserModel = require('./../model/users');
 var postModel = require('./../model/posts');
 var NotificationModel = require('./../model/notifications');
+const CONSTANT = require('./../common/constant');
+var s3BucketConfig = require('./../common/s3_bucket_config');
 
 exports.addNewPost = async (req, res, next) => {
     try {
@@ -220,10 +222,31 @@ exports.getAllUserPostofGroup = async (req, res) => {
 
 exports.deleteData = async (req, res) => {
     try {
+        const postData = await postModel.findById(req.params.id);
         const RemovedData = await postModel.remove({ _id: req.params.id });
-        const RemoveNotification= await NotificationModel.deleteMany({post_id:req.params.id})
-
         res.status(200).json({ message: "Removed Group: ", result: RemovedData });
+        if(postData.image && postData.image.length > 0){
+            var fileArr = postData.image;
+            s3BucketConfig.removeMultipleFilesFromS3(fileArr, CONSTANT.PostMediaBucketName, function(err, data){
+                if(err){
+                    console.log(err);
+                }
+            });
+        } else {
+            const fileName = "";
+            if(postData.video || postData.document){
+                fileName = postData.video ? postData.video : postData.document;
+            }
+            fileName = fileName.split('/').slice(-1)[0];
+            if(fileName){
+                s3BucketConfig.removeFileFromS3(fileName, CONSTANT.PostMediaBucketName, function(err, res){
+                    if(err){
+                        console.log(err);
+                    }
+                });
+            }
+        }
+        const RemoveNotification= await NotificationModel.deleteMany({post_id:req.params.id});
     } catch (err) {
         console.log(err)
         res.status(400).json({ message: err });

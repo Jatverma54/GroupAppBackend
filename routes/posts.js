@@ -9,7 +9,7 @@ const upload = require('../middleware/multer')
 const CONSTANT = require('../common/constant');
 
 router.post('/createNewPost/', auth,[upload.array('file')], function (req, res) {
-
+    console.log(req);
     postObj.addNewPost(req, res);
 
 });
