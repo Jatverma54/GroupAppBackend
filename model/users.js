@@ -50,7 +50,7 @@ var UserModelSchema = new mongoose.Schema({
         dob:{ type: Date, required: true,trim: true },
         full_name: { type: String, required: true,  trim: true },
         role: { type: String, required: true,  trim: true, default:"User" },
-        UserCreateddate: { type: Date,  default: new Date() }
+        UserCreateddate: { type: Date,  default: Date.now }
     },
     tokens: [{
         token: {

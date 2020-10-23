@@ -9,7 +9,7 @@ var NotificationModelSchema = new Schema({
     activity_by: {type:Schema.Types.ObjectId, ref:'UserModel'},
     activity: String, 
     post_id: {type:Schema.Types.ObjectId, ref:'postModel'},
-    Createddate:{type: Date, default: new Date()},
+    Createddate:{type: Date, default: Date.now},
     notificationType:String,
     comment_id: {type:Schema.Types.ObjectId, ref:'postModel'},
     read:{type:Boolean,default:false},

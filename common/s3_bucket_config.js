@@ -43,7 +43,7 @@ exports.uploadFile = (fileName, userName,BUCKET_NAME) => {
         // Setting up S3 upload parameters
         const params = {
             Bucket: BUCKET_NAME,
-            Key: userName+"_"+new Date().getTime()+"."+ext,//+imageExtension, // File name you want to save as in S3
+            Key: userName+"_"+Date.now.getTime()+"."+ext,//+imageExtension, // File name you want to save as in S3
             Body: buffer,
             ACL:'public-read',
             ContentEncoding: 'base64',

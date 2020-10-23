@@ -379,7 +379,7 @@ exports.addNewComment = async (req, res) => {
 
         var PostData = await postModel.findById(req.body.postId)
 
-        PostData.Comments = PostData.Comments.concat({ comment: comment, LikedBy: [], OnwerId: req.user._id, createdAt: new Date() })//name: result.GroupName,
+        PostData.Comments = PostData.Comments.concat({ comment: comment, LikedBy: [], OnwerId: req.user._id, createdAt: Date.now })//name: result.GroupName,
 
         PostData.save();
 
@@ -612,7 +612,7 @@ exports.addNewReplyComment = async (req, res) => {
 
         var commentData = PostData.Comments.find(id => id._id.toString() === req.body.commentId)
 
-        commentData.ReplyComment = commentData.ReplyComment.concat({ comment: comment, LikedBy: [], OnwerId: req.user._id, createdAt: new Date() })//name: result.GroupName,
+        commentData.ReplyComment = commentData.ReplyComment.concat({ comment: comment, LikedBy: [], OnwerId: req.user._id, createdAt: Date.now })//name: result.GroupName,
 
         PostData.save();
 
@@ -802,8 +802,27 @@ exports.getAllPublicJoinedPostofGroup = async (req, res) => {
                 }
             }
         }
+        postdataObjectArray = postdataObjectArray.sort(function (a, b) {
+            return b.GroupName.localeCompare( a.GroupName );
 
-        res.status(200).json({ message: "User as Admin: ", result: postdataObjectArray });
+            // var time=new Date(a.time).getTime()
+            // var newtime=new Date(b.time).getTime()
+            // return time-newtime;
+        });
+
+var arr=postdataObjectArray;
+  for(var j, x, i = arr.length; i; j = parseInt(Math.random() * i), x = arr[--i], arr[i] = arr[j], arr[j] = x);
+    
+
+        arr = arr.sort(function (a, b) {
+           
+            var time=new Date(a.time).getTime()
+            var newtime=new Date(b.time).getTime()
+            return newtime-time;
+        });
+        
+       
+        res.status(200).json({ message: "User as Admin: ", result: arr});
     } catch (err) {
         console.log(err)
         res.status(400).json({ message: err });
