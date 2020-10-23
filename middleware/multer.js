@@ -21,8 +21,8 @@ var upload = multer({
         bucket: CONSTANT.PostMediaBucketName,
         acl: 'public-read',
         key: function (req, file, cb) { 
-          
-         cb(null, req.user._id + '-'+req.body.GroupId+'-'+ file.originalname); //use Date.now() for unique file keys
+         
+         cb(null, req.user._id + '-'+ file.originalname); //use Date.now() for unique file keys
       
         }
     }),   limits: { fileSize: 1024 * 1024 * 50 }, // 50MB

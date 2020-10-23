@@ -35,7 +35,7 @@ exports.addNewPost = async (req, res, next) => {
             req.body.document = req.files[0].location;
         }
         else if (req.body.content === "image") {
-            console.log(req.files)
+          
             var ImagesUrl = []
             var imagesobject = req.files;
             for (var data in imagesobject) {
@@ -233,7 +233,7 @@ exports.deleteData = async (req, res) => {
                 }
             });
         } else {
-            const fileName = "";
+            var fileName = "";
             if(postData.video || postData.document){
                 fileName = postData.video ? postData.video : postData.document;
             }
@@ -256,9 +256,8 @@ exports.deleteData = async (req, res) => {
 
 exports.deleteDataAndUserfromGroup = async (req, res) => {
     try {
+        const postData = await postModel.findById(req.body.postId);
         const RemovedData = await postModel.remove({ _id: req.body.postId });
-
-         const RemoveNotification= await NotificationModel.deleteMany({post_id:req.body.postId})
 
         const userdata = await UserModel.findOne({ _id: req.body.userId });
 
@@ -276,6 +275,28 @@ exports.deleteDataAndUserfromGroup = async (req, res) => {
         }
 
         res.status(200).json({ message: "Removed Group: ", result: RemovedData });
+        if(postData.image && postData.image.length > 0){
+            var fileArr = postData.image;
+            s3BucketConfig.removeMultipleFilesFromS3(fileArr, CONSTANT.PostMediaBucketName, function(err, data){
+                if(err){
+                    console.log(err);
+                }
+            });
+        } else {
+            var fileName = "";
+            if(postData.video || postData.document){
+                fileName = postData.video ? postData.video : postData.document;
+            }
+            fileName = fileName.split('/').slice(-1)[0];
+            if(fileName){
+                s3BucketConfig.removeFileFromS3(fileName, CONSTANT.PostMediaBucketName, function(err, res){
+                    if(err){
+                        console.log(err);
+                    }
+                });
+            }
+        }
+        const RemoveNotification= await NotificationModel.deleteMany({post_id:req.body.postId})
     } catch (err) {
         console.log(err)
         res.status(400).json({ message: err });
