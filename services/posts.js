@@ -106,11 +106,70 @@ function savePostInDB(req, res,) {
 }
 
 
+exports.getAllPostofGroupFromNotification = async (req, res) => {
+    try {
+        const postData = await postModel.findById(req.params.id);
+        // const userData = await UserModel.findById(postdata[0].OnwerId);
+        //   await user.populate('posts').execPopulate();
+        await postData.populate("GroupId").execPopulate();
+       
+       
+        let postdataObjectArray = [];
+     
+            let postdataObject = postData.toObject()
+            postdataObject.countLikes = postData.likedBy.length;
+            postdataObject.countcomments = postData.Comments.length;
+            postdataObject.GroupName = postData.GroupId.GroupName;
+            postdataObject.GroupAdmin = postData.GroupId.admin_id;
+            postdataObject.isLiked = postData.likedBy.find(a => a.toString() === req.user._id.toString()) ? true : false;
+            postdataObject.currentUser = req.user._id;
+            postdataObject.currentUserPic = req.user.profile.profile_pic;
+            //To Be Changed
+            var userData = await postData.populate('OnwerId').execPopulate()
+
+            // var userData=await UserModel.findById(postdataObject.OnwerId);
+            postdataObject.OnwerProfilePic = userData.OnwerId.profile.profile_pic;
+            postdataObject.OnwerName = userData.OnwerId.profile.full_name;
+
+            // postdataObject.currentUser = req.user._id;
+            let toBeInserted = [];
+            if (postData.likedBy.length !== 0) {
+
+                const userData = await postData.populate(['likedBy']).execPopulate()
+
+                for (var i = 0; i < userData.likedBy.length; i++) {
+                    if (i <= 5) {
+
+                        // console.log(userData)
+                        //await UserModel.findById(postData[data].likedBy[i]);
+                        toBeInserted.push(userData.likedBy[i].profile.profile_pic);
+
+                    } else {
+                        break;
+                    }
+
+                }
+
+            }
+            postdataObject.LikePictures = toBeInserted
+            delete postdataObject.GroupId
+            postdataObjectArray.push(postdataObject)
+       
+
+        res.status(200).json({ message: "User as Admin: ", result: postdataObjectArray });
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({ message: err });
+    }
+
+}
+
+
 exports.getAllPostofGroup = async (req, res) => {
     try {
         const group = await groupModel.findById(req.body.groupId);
 
-        await group.populate({ path: 'posts', options: { sort: { time: -1 } } }).execPopulate();
+        await group.populate({ path: 'posts', options: { sort: { createdAt: -1 }, limit:parseInt(req.query.limit),skip:parseInt(req.query.skip)  } }).execPopulate();
         var postData = group.posts;
 
         // const userData = await UserModel.findById(postdata[0].OnwerId);
@@ -167,13 +226,16 @@ exports.getAllPostofGroup = async (req, res) => {
 
 
 
+
+
+
 exports.getAllUserPostofGroup = async (req, res) => {
     try {
         const group = await groupModel.findById(req.body.groupId);
         // await group.populate('posts').execPopulate();
         // var postData = group.posts;
         const user = await UserModel.findById(req.user._id);
-        await user.populate({ path: 'posts', options: { sort: { time: -1 } } }).execPopulate();
+        await user.populate({ path: 'posts', options: { sort: { createdAt: -1 }, limit:parseInt(req.query.limit),skip:parseInt(req.query.skip)  } }).execPopulate();
 
         var postData = user.posts.filter(a => a.GroupId.toString() === group._id.toString());
 
@@ -350,8 +412,10 @@ exports.viewlikes = async (req, res) => {
         var PostData = await postModel.findById(PostId);
         LikedUser = []
         if (PostData.likedBy.length !== 0) {
-              const userData =await PostData.populate(['likedBy']).execPopulate()
-         
+              var userData =await PostData.populate(['likedBy']).execPopulate()
+     
+       userData.likedBy= paginate(userData.likedBy,req.query.page_size,req.query.page_number)
+
             for (var data in userData.likedBy) {
 
               //  var userData = await UserModel.findById(PostData.likedBy[data]);
@@ -405,6 +469,10 @@ exports.addNewComment = async (req, res) => {
     }
 }
 
+function paginate(array, page_size, page_number) {
+    // human-readable page numbers usually start with 1, so we reduce 1 in the first argument
+    return array.slice((page_number - 1) * page_size, page_number * page_size);
+  }
 
 exports.getComments = async (req, res) => {
 
@@ -415,7 +483,12 @@ exports.getComments = async (req, res) => {
         var PostData = await postModel.findById(PostId)
 
         var Response = [];
+      
+
         if (PostData.Comments.length !== 0) {
+
+            PostData.Comments= paginate(PostData.Comments,req.query.page_size,req.query.page_number)
+
             for (var data in PostData.Comments) {
 
                 let postdataObject = PostData.Comments[data].toObject();
@@ -505,6 +578,8 @@ exports.viewCommentlikes = async (req, res) => {
         LikedUser = []
         if (commentsData.LikedBy.length !== 0) {
 
+            commentsData.LikedBy= paginate(commentsData.LikedBy,req.query.page_size,req.query.page_number)
+
             for (var data in commentsData.LikedBy) {
 
                 var userData = await UserModel.findById(commentsData.LikedBy[data]);
@@ -562,6 +637,7 @@ exports.getReplyComments = async (req, res) => {
 
 
         if (ReplyComments.ReplyComment.length) {
+            ReplyComments.ReplyComment= paginate(ReplyComments.ReplyComment,req.query.page_size,req.query.page_number)
             for (var data in ReplyComments.ReplyComment) {
 
                 let postdataObject = ReplyComments.ReplyComment[data].toObject();
@@ -653,7 +729,7 @@ exports.replyCommentslike = async (req, res) => {
             ReplycommentsData.LikedBy.push(req.user._id);
             
         var notify = {
-
+ 
             group_id: PostData.GroupId,
             activity_by: req.user._id,
             activity: "RepliedOnCommentLike",
@@ -696,6 +772,7 @@ exports.viewReplyCommentlikes = async (req, res) => {
 
         LikedUser = []
         if (ReplycommentsData.LikedBy.length !== 0) {
+            ReplycommentsData.LikedBy= paginate(ReplycommentsData.LikedBy,req.query.page_size,req.query.page_number)
 
             for (var data in ReplycommentsData.LikedBy) {
 
@@ -731,7 +808,7 @@ exports.deleteReplyComment = async (req, res) => {
 
 
         PostData.save();
-
+        const RemoveNotification= await NotificationModel.deleteMany({post_id:PostId, Replycomment_id:req.body.ReplycommentId})
         res.status(200).send({ result: PostData });
 
     } catch (err) {
@@ -753,7 +830,7 @@ exports.getAllPublicJoinedPostofGroup = async (req, res) => {
             const group = await groupModel.findById(req.user.joined_groups[data].groupid);
 
             if (group.group_type === 'public') {
-                await group.populate({ path: 'posts', options: { sort: { time: -1 } } }).execPopulate();
+                await group.populate({ path: 'posts', options: { sort: { createdAt: -1 }, limit:parseInt(req.query.limit),skip:parseInt(req.query.skip)   } }).execPopulate();
                 var postData = group.posts;
                 // const userData = await UserModel.findById(postdata[0].OnwerId);
                 //   await user.populate('posts').execPopulate();

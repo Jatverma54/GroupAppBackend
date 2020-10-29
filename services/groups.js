@@ -95,12 +95,18 @@ exports.getPublicGroups = async (req, res) => {
     }
 }
 
+function paginate(array, page_size, page_number) {
+    // human-readable page numbers usually start with 1, so we reduce 1 in the first argument
+    return array.slice((page_number - 1) * page_size, page_number * page_size);
+  }
+
 
 exports.getPublicGroupsWithCategory = async (req, res) => {
     try {
 
         var groupData = await groupModel.find({ group_type: "public", GroupCategory_id: req.body.GroupCategory_id });
         
+        groupData= paginate(groupData,req.query.page_size,req.query.page_number)
      
         for (var data in groupData) {
             groupData[data].isRequested = req.user.Requested_groups.find(a => a.groupid.toString() === groupData[data]._id.toString()) ? true : false;
@@ -154,8 +160,8 @@ exports.deleteData = async (req, res) => {
 
 
         res.status(200).json({ message: "Removed Group: ", result: "" });
-
-        await GroupData.populate({ path: 'posts', options: { sort: { time: -1 } } }).execPopulate();
+//changed
+        await GroupData.populate({ path: 'posts', options: { sort: { createdAt: -1 } } }).execPopulate();
         var postData = GroupData.posts;
 
         // const userData = await UserModel.findById(postdata[0].OnwerId);
@@ -199,8 +205,10 @@ exports.viewGroupMembers = async (req, res) => {
 
         const groupData = await groupModel.findOne({ _id: req.body.groupid });
 
-        const filteredArray = await UserModel.find({ "joined_groups.groupid": groupData._id, });
+        var filteredArray = await UserModel.find({ "joined_groups.groupid": groupData._id, });
 
+    
+        filteredArray= paginate(filteredArray,req.query.page_size,req.query.page_number)
 
         // const filteredArray = await UserModel.aggregate([
         //     { "$match": { "joined_groups.groupid": groupData._id } },
@@ -222,7 +230,7 @@ exports.viewGroupMembers = async (req, res) => {
 
         res.status(200).json({ message: "Group Members: ", result: filteredArray });
     } catch (err) {
-        //console.log(err)
+       console.log(err)
         res.status(400).json({ message: err });
     }
 }
@@ -753,7 +761,7 @@ exports.groupSearchQuery = async (req, res) => {
                     "group_type": 'public'
                 }},
         
-            
+                { "$limit" : 10 }
         
         
                 // Group back as an array with only the matching elements
@@ -764,7 +772,7 @@ exports.groupSearchQuery = async (req, res) => {
                 //     "groupIcon": { "$first": "$image" },
                 // }}
             ],
-            function(err,results) {
+          async  function(err,results) {
                 if(err){
                     console.log(err)
                     res.status(400).json({ message: err });
@@ -772,11 +780,16 @@ exports.groupSearchQuery = async (req, res) => {
                   //  console.log(results)
 
                   for (var data in results) {
-                
-                    results[data].isJoined = req.user.joined_groups.find(a => a.groupid.toString() === results[data]._id.toString()) ? true : false;
+                      var groupCategoryImage= await CategoryModel.findById(results[data].GroupCategory_id)
                   
+                     
+                      results[data].isJoined = req.user.joined_groups.find(a => a.groupid.toString() === results[data]._id.toString()) ? true : false;
+                      results[data].CategoryImage=groupCategoryImage.image
+
+                   
                 }
-                    res.status(200).json({ message: "Joined Groups : ", result: results });
+               
+                    res.status(200).json({ message: "Joined Groups : ", result:results});
                 }
             }
         )

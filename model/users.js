@@ -59,7 +59,7 @@ var UserModelSchema = new mongoose.Schema({
         }
     }],
     isActive: { type: Boolean, required: true, default: false }
-});
+},{timestamps:true});
 
 UserModelSchema.methods.generateAuthToken = async function () {
     const user = this

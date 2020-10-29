@@ -5,11 +5,18 @@ var UserModel = require('./../model/users');
 var postModel = require('./../model/posts');
 var NotificationModel = require('./../model/notifications');
 
+
+function paginate(array, page_size, page_number) {
+    // human-readable page numbers usually start with 1, so we reduce 1 in the first argument
+    return array.slice((page_number - 1) * page_size, page_number * page_size);
+  }
+
 exports.getNotification = async (req, res, next) => {
     try {
-
-        var notificationData = await NotificationModel.find({ group_id: req.params.id }).sort('-Createddate').exec()
-
+//sort
+        var notificationData = await NotificationModel.find({ group_id: req.params.id }).sort('-createdAt').exec()
+        notificationData= paginate(notificationData,req.query.page_size,req.query.page_number)
+       
         let ToBeInserted = []
 
         for (var data in notificationData) {
@@ -24,7 +31,7 @@ exports.getNotification = async (req, res, next) => {
 
             } else if (notificationData[data].notificationType === "UserSpecific") {
 
-                if (PostData.post_id.OnwerId.toString() === req.user._id.toString() && req.user._id.toString() !== notificationData[data].activity_by._id.toString()) {
+                if (PostData.post_id&&PostData.post_id.OnwerId.toString() === req.user._id.toString() && req.user._id.toString() !== notificationData[data].activity_by._id.toString()) {
                     var notify = notificationData[data].toObject();
                     ToBeInserted.push(notify)
                 }
@@ -34,7 +41,7 @@ exports.getNotification = async (req, res, next) => {
                 let comments = PostData.post_id.Comments.find(a => a._id.toString() === notificationData[data].comment_id.toString());
 
 
-                if (comments.OnwerId.toString() === req.user._id.toString() && req.user._id.toString() !== notificationData[data].activity_by._id.toString()) {
+                if (comments&&comments.OnwerId.toString() === req.user._id.toString() && req.user._id.toString() !== notificationData[data].activity_by._id.toString()) {
                     var notify = notificationData[data].toObject();
                     notify.comment = comments
 
@@ -42,7 +49,8 @@ exports.getNotification = async (req, res, next) => {
                 }
                 else if (notificationData[data].activity === "RepliedOnCommentLike") {
                     let ReplycommentsData = comments.ReplyComment.find(id => id._id.toString() === notificationData[data].Replycomment_id.toString())
-                    if (ReplycommentsData.OnwerId.toString() === req.user._id.toString() && req.user._id.toString() !== notificationData[data].activity_by._id.toString()) {
+               
+                    if (ReplycommentsData&&ReplycommentsData.OnwerId.toString() === req.user._id.toString() && req.user._id.toString() !== notificationData[data].activity_by._id.toString()) {
                         var notify = notificationData[data].toObject();
                         notify.comment = comments;
                         notify.Replycomment = ReplycommentsData
@@ -72,8 +80,8 @@ exports.getAllNotification = async (req, res, next) => {
         for (var data in req.user.joined_groups) {
 
 
-            var notificationData = await NotificationModel.find({ group_id:req.user.joined_groups[data].groupid  }).limit(50).sort('-Createddate').exec()
-           
+            var notificationData = await NotificationModel.find({ group_id:req.user.joined_groups[data].groupid  }).limit(50).sort('-createdAt').exec()
+            notificationData= paginate(notificationData,req.query.page_size,req.query.page_number)
 
         for (var data in notificationData) {
             var userData = await notificationData[data].populate('activity_by').execPopulate();
@@ -87,7 +95,7 @@ exports.getAllNotification = async (req, res, next) => {
 
             } else if (notificationData[data].notificationType === "UserSpecific") {
 
-                if (PostData.post_id.OnwerId.toString() === req.user._id.toString() && req.user._id.toString() !== notificationData[data].activity_by._id.toString()) {
+                if (PostData.post_id&&PostData.post_id.OnwerId.toString() === req.user._id.toString() && req.user._id.toString() !== notificationData[data].activity_by._id.toString()) {
                     var notify = notificationData[data].toObject();
                     ToBeInserted.push(notify)
                 }
@@ -97,7 +105,7 @@ exports.getAllNotification = async (req, res, next) => {
                 let comments = PostData.post_id.Comments.find(a => a._id.toString() === notificationData[data].comment_id.toString());
 
 
-                if (comments.OnwerId.toString() === req.user._id.toString() && req.user._id.toString() !== notificationData[data].activity_by._id.toString()) {
+                if (comments&&comments.OnwerId.toString() === req.user._id.toString() && req.user._id.toString() !== notificationData[data].activity_by._id.toString()) {
                     var notify = notificationData[data].toObject();
                     notify.comment = comments
 
@@ -105,7 +113,7 @@ exports.getAllNotification = async (req, res, next) => {
                 }
                 else if (notificationData[data].activity === "RepliedOnCommentLike") {
                     let ReplycommentsData = comments.ReplyComment.find(id => id._id.toString() === notificationData[data].Replycomment_id.toString())
-                    if (ReplycommentsData.OnwerId.toString() === req.user._id.toString() && req.user._id.toString() !== notificationData[data].activity_by._id.toString()) {
+                    if (ReplycommentsData&&ReplycommentsData.OnwerId.toString() === req.user._id.toString() && req.user._id.toString() !== notificationData[data].activity_by._id.toString()) {
                         var notify = notificationData[data].toObject();
                         notify.comment = comments;
                         notify.Replycomment = ReplycommentsData

@@ -10,7 +10,7 @@ var groupModelSchema = new Schema({
     group_type: { type: String, required: true,  trim: true, },
     GroupCategory:{ type: String,  },
     //groupMembers:[{type:Schema.Types.ObjectId,required:true}],
-    GroupCategory_id: { type:Schema.Types.ObjectId},
+    GroupCategory_id: { type:Schema.Types.ObjectId,ref:"CategoryModel"},
     privacy: { type: String,   trim: true, },
     owner_id: {type:Schema.Types.ObjectId,required:true, },//ref: 'UserModel'
     admin_id: [{type:Schema.Types.ObjectId,required:true}],
@@ -22,8 +22,9 @@ var groupModelSchema = new Schema({
    // RequestedBy: [{type:Schema.Types.ObjectId}],
    isRequested:{ type: Boolean},
   countMembers:{type:Number},
-LastUpdated: { type: Date,  default:Date.now },
-});
+LastUpdated: { type: Date,  default:Date.now }
+
+},{timestamps:true});
 
 groupModelSchema.virtual('posts', {
   ref: 'postModel',

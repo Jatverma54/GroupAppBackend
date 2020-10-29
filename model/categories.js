@@ -9,7 +9,7 @@ var CategoryModelSchema = new Schema({
     Groups:{ type: String,trim: true},
     image:{type: String}
     
-});
+},{timestamps:true});
 
 CategoryModelSchema.plugin(uniqueValidator);
 

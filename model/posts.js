@@ -34,7 +34,7 @@ var PostModelSchema = new Schema({
     LikedBy:
     [{type:Schema.Types.ObjectId, ref: 'UserModel'}],
      OnwerId: {type:Schema.Types.ObjectId, ref: 'UserModel'},
-    createdAt: { type: Date, default: Date.now  },
+     CommentcreatedAt: { type: Date, default: Date.now  },
     ReplyComment: [
 
       {
@@ -43,7 +43,7 @@ var PostModelSchema = new Schema({
           [Schema.Types.ObjectId],
         OnwerId: {type:Schema.Types.ObjectId, ref: 'UserModel'},
 
-        createdAt: { type: Date, default:Date.now }
+        CommentcreatedAt: { type: Date, default:Date.now }
       }]
 
   }], //text, commented_by, date
@@ -54,7 +54,7 @@ var PostModelSchema = new Schema({
   },
 
 
-});
+},{timestamps:true});
 
 
 
@@ -63,7 +63,7 @@ PostModelSchema.pre('save', async function preSave(next){
   if (this.isNew){
     var userVerified = await groupModel.update({
       _id: something.GroupId,
-  }, { $set: { LastUpdated:Date.now } });
+  }, { $set: { LastUpdated:Date.now() } });
   }
  
   next();

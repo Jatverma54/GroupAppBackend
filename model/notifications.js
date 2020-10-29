@@ -14,7 +14,7 @@ var NotificationModelSchema = new Schema({
     comment_id: {type:Schema.Types.ObjectId, ref:'postModel'},
     read:{type:Boolean,default:false},
     Replycomment_id: {type:Schema.Types.ObjectId, ref:'postModel'},
-});
+},{timestamps:true});
 
  
 const NotificationModel = mongoose.model('NotificationModel', NotificationModelSchema );

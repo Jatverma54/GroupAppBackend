@@ -21,11 +21,26 @@ router.post('/getAllPostofGroup', auth, function (req, res) {
 
 });
 
+router.get('/getAllPostofGroup/:id', auth, function (req, res) {
+
+    postObj.getAllPostofGroupFromNotification(req, res);
+
+});
+
+
 router.post('/getAllUserPostofGroup', auth, function (req, res) {
 
 
 
     postObj.getAllUserPostofGroup(req, res);
+
+});
+
+router.post('/getAllUserPostofGroup/:id', auth, function (req, res) {
+
+
+
+    postObj.getAllPostofGroupFromNotification(req, res);
 
 });
 
