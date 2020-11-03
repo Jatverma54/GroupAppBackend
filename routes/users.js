@@ -101,4 +101,29 @@ router.post('/adduserTogroup',auth, function(req, res){
 });
 
 
+router.post('/ForgetPassword/AuthenticateEmail', function(req, res){
+    //console.log("****User data");
+    userObj.AuthenticateEmail(req,res);
+});
+
+router.post('/ForgetPassword/AuthenticateConfirmationCode', function(req, res){
+    //console.log("****User data");
+    userObj.AuthenticateConfirmationCode(req,res);
+});
+
+
+
+router.post('/updateUserPasswordFromForget', function(req, res){
+    //console.log("****req.body.password", req.body.password);
+
+    bcrypt.hash(req.body.password, CONSTANT.BCRYPT_SALT, (err, encrypted) => {
+        //console.log("****req.body.password", req.body.password);
+        //console.log("****encrypted", encrypted);
+        req.body.password = encrypted
+        userObj.updateUserPasswordFromForget(req, res);
+    });
+});
+
+
+
 module.exports = router;

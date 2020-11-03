@@ -105,7 +105,9 @@ exports.getPublicGroupsWithCategory = async (req, res) => {
     try {
 
         var groupData = await groupModel.find({ group_type: "public", GroupCategory_id: req.body.GroupCategory_id });
-        
+      
+     
+
         groupData= paginate(groupData,req.query.page_size,req.query.page_number)
      
         for (var data in groupData) {
@@ -115,7 +117,7 @@ exports.getPublicGroupsWithCategory = async (req, res) => {
              groupData[data].countMembers=count.groupList.length;
             //await UserModel.countDocuments({ "joined_groups.groupid": groupData[data]._id });
            
-           
+          await  groupData[data].populate(['admin_id']).execPopulate()
         }
 
         res.status(200).json({ message: "Data: ", result: groupData });
@@ -207,7 +209,7 @@ exports.viewGroupMembers = async (req, res) => {
 
         var filteredArray = await UserModel.find({ "joined_groups.groupid": groupData._id, });
 
-    
+       
         filteredArray= paginate(filteredArray,req.query.page_size,req.query.page_number)
 
         // const filteredArray = await UserModel.aggregate([
@@ -296,6 +298,7 @@ exports.getJoinedPublicGroups = async (req, res) => {
         var groupData = Gdata.createdgroup;
 
         groupData = groupData.filter(a => a.group_type.toString() === "public")
+
         // UserModel.aggregate ([{ $match: { isActive: true } }, 
         //     { $unwind: "$joined_groups" }, 
         //     { $group: { _id: "$joined_groups", joined_groupsid: { $addToSet: ["5f7ca461e90194533c8ee52f"] } } }, 
@@ -307,6 +310,9 @@ exports.getJoinedPublicGroups = async (req, res) => {
 
         if (req.user.created_groups.length !== 0 && groupData.length !== 0) {
 
+             //changed 
+             groupData= paginate(groupData,req.query.page_size,req.query.page_number)
+
             let ToBeInserted = {
                 GroupCategory: "Your Groups",
                 data: []
@@ -317,7 +323,7 @@ exports.getJoinedPublicGroups = async (req, res) => {
                 // //console.log(groupData)
                 var count  = await groupData[data].populate('groupList').execPopulate();
                 groupData[data].countMembers=count.groupList.length;
-             
+                await  groupData[data].populate(['admin_id']).execPopulate()
                //await UserModel.countDocuments({ "joined_groups.groupid": groupData[data]._id, });
 
                 const groupObject = groupData[data].toObject()
@@ -341,6 +347,10 @@ exports.getJoinedPublicGroups = async (req, res) => {
 
 
         if (req.user.joined_groups.length !== 0 && postData.length !== 0) {
+
+              //changed
+      
+        postData= paginate(postData,req.query.page_size,req.query.page_number)
 
             var categoryData = await CategoryModel.find();
             for (var data in categoryData) {
@@ -375,7 +385,7 @@ exports.getJoinedPublicGroups = async (req, res) => {
                             //   groups[groupDataArr].countMembers =
                             // await UserModel.countDocuments({ "joined_groups.groupid": groups[groupDataArr]._id, });
 
-
+                            await   groups[groupDataArr].populate(['admin_id']).execPopulate()
                             //const groupObject = groupData
                             // delete groupObject.GroupCategory_id;
                             // delete groupObject.admin_id;
@@ -665,10 +675,9 @@ exports.getJoinedPrivateGroups = async (req, res) => {
               
                // groupData[data].countMembers = await UserModel.countDocuments({ "joined_groups.groupid": groupData[data]._id, });
                var count  = await groupData[data].populate('groupList').execPopulate();
+               await   groupData[data].populate(['admin_id']).execPopulate()
                groupData[data].countMembers=count.groupList.length;
-              
-              
-              
+                     
                 const groupObject = groupData[data].toObject()
                 groupObject.currentUser = req.user._id;
 

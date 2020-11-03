@@ -58,6 +58,9 @@ var UserModelSchema = new mongoose.Schema({
             required: true
         }
     }],
+    resetCode:  {
+        type: Number,
+        },
     isActive: { type: Boolean, required: true, default: false }
 },{timestamps:true});
 

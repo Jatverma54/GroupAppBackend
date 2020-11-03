@@ -13,7 +13,7 @@ var groupModelSchema = new Schema({
     GroupCategory_id: { type:Schema.Types.ObjectId,ref:"CategoryModel"},
     privacy: { type: String,   trim: true, },
     owner_id: {type:Schema.Types.ObjectId,required:true, },//ref: 'UserModel'
-    admin_id: [{type:Schema.Types.ObjectId,required:true}],
+    admin_id: [{type:Schema.Types.ObjectId,required:true,ref: 'UserModel'}],
     image: { type: String,default:null},
     groupCreateddate: { type: Date,  default:Date.now },
     post:[Object],

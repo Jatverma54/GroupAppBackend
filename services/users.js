@@ -1,6 +1,7 @@
 var UserModel = require('./../model/users');
 const auth = require('../middleware/auth');
 const sendEmail = require('./../common/mailer_config');
+const sendConfirmationEmail = require('./../common/mailer_config_email');
 const uploadFile = require('./../common/s3_bucket_config');
 const CONSTANT = require('./../common/constant');
 const s3Config = require('./../common/s3_bucket_config');
@@ -303,4 +304,115 @@ exports.adduserTogroup = async (req, res) => {
     }
 
 
+}
+
+function generator() {
+
+    const ran1 = () => [1, 2, 3, 4, 5, 6, 7, 8, 9, 0].sort((x, z) => {
+        ren = Math.random();
+        if (ren == 0.5) return 0;
+        return ren > 0.5 ? 1 : -1
+    })
+    const ran2 = () => ran1().sort((x, z) => {
+        ren = Math.random();
+        if (ren == 0.5) return 0;
+        return ren > 0.5 ? 1 : -1
+    })
+
+    return Array(6).fill(null).map(x => ran2()[(Math.random() * 9).toFixed()]).join('')
+}
+
+
+
+
+exports.AuthenticateEmail = async (req, res) => {
+
+    try {
+        const UserData = await UserModel.findOne({email: req.body.Email});
+        
+        if(UserData){
+
+var resetCode=generator();
+
+UserData.resetCode=resetCode
+
+await UserData.save()
+
+            var params = {
+                userID: UserData._id,
+                email: UserData.email,
+                FullName: UserData.profile.full_name,
+                Username:UserData.username,
+                resetCode:resetCode
+            }
+            sendConfirmationEmail(params, async function (err, resp) {
+                if (err) {
+                   
+                    res.status(400).send({ error: "Unable to send confirmation code. Internal error occured." });
+                } else {
+                    //console.log("mail success");
+                    res.status(200).json({ message: "Confirmation code sent",result: UserData});
+                }
+            });
+            
+        }
+        else{
+            res.status(422).json({ message: "Email id does not exist" });
+        }
+       
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({ message: err });
+    }
+
+
+}
+
+
+
+exports.AuthenticateConfirmationCode = async (req, res) => {
+
+    try {
+        const UserData = await UserModel.findById(req.body.Userid);
+        
+        if(UserData.resetCode===req.body.confrimationCode){
+
+            res.status(200).json({ message: "Confirmation code Verified",result: UserData});
+
+UserData.resetCode=""
+
+await UserData.save()
+
+}
+        else{
+            res.status(422).json({ message: "Verification Failed" });
+        }
+       
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({ message: err });
+    }
+
+
+}
+
+
+
+exports.updateUserPasswordFromForget =async  (req, response) => {
+    try {
+       
+                var password= req.body.password;
+          
+                var userVerified = await UserModel.update({
+                    _id: req.body.UserId,
+                }, { $set: { password} });
+                response.status(200).send("Password updated successfully");
+   
+        // //console.log("Failed to upload profile pic", e);   
+
+    } catch (err) {
+       console.log(err,"error")  
+      response.status(400).send({ error: "Something went wrong!! Please try again" });
+     
+    }
 }
