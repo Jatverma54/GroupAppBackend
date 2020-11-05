@@ -47,7 +47,7 @@ function saveUserInDB(req, res, picLocation) {
             }
             sendEmail(params, async function (err, resp) {
                 if (err) {
-                   
+               
                     const deleteUser = await UserModel.remove({ _id: result._id });
                     //console.log("mail error", err);
                     const filename = picLocation.split('/').slice(-1)[0];

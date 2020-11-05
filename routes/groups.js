@@ -122,4 +122,11 @@ router.post('/groupSearchQuery', auth,function(req, res){
 });
 
 
+
+router.get('/getPublicGroupListScreen/:id', auth,function(req, res){
+    //console.log("****req.body.password", req.body.password);
+    groupsObj.getPublicGroupListScreen(req,res);
+});
+
+
 module.exports = router;

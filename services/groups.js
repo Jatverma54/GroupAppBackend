@@ -577,7 +577,9 @@ exports.getAllGroupRequest = async (req, res) => {
     try {
         // const groupData = await groupModel.findById(req.body._id);
 
-        const UserData = await UserModel.find({ "Requested_groups.groupid": req.body.groupId });
+        var UserData = await UserModel.find({ "Requested_groups.groupid": req.body.groupId });
+
+        UserData= paginate(UserData,req.query.page_size,req.query.page_number);
 
         res.status(200).json({ message: "Users Requested: ", result: UserData });
     } catch (err) {
@@ -794,7 +796,7 @@ exports.groupSearchQuery = async (req, res) => {
                      
                       results[data].isJoined = req.user.joined_groups.find(a => a.groupid.toString() === results[data]._id.toString()) ? true : false;
                       results[data].CategoryImage=groupCategoryImage.image
-
+                    
                    
                 }
                
@@ -806,6 +808,32 @@ exports.groupSearchQuery = async (req, res) => {
     } catch (err) {
         console.log(err)
         res.status(400).json({ message: err });
+    }
+}
+
+
+
+exports.getPublicGroupListScreen = async (req, res) => {
+    try {
+
+        var groupData = await groupModel.findById(req.params.id)
+        await  groupData.populate(['admin_id']).execPopulate();
+
+        const groupObject = groupData.toObject()
+        
+            groupObject.isRequested = req.user.Requested_groups.find(a => a.groupid.toString() === groupData._id.toString()) ? true : false;
+            groupObject.isJoined = req.user.joined_groups.find(a => a.groupid.toString() === groupData._id.toString()) ? true : false;
+           var count  = await groupData.populate('groupList').execPopulate();
+           groupObject.countMembers=count.groupList.length;
+            //await UserModel.countDocuments({ "joined_groups.groupid": groupData[data]._id });
+           
+         
+        
+
+        res.status(200).json({ message: "Data: ", result: [groupObject] });
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({ error: err });
     }
 }
 
