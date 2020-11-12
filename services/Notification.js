@@ -40,13 +40,14 @@ exports.getNotification = async (req, res, next) => {
 
                 let comments = PostData.post_id.Comments.find(a => a._id.toString() === notificationData[data].comment_id.toString());
 
-
+                 if (notificationData[data].activity === "CommentLike"||notificationData[data].activity === "RepliedOnComment") {
                 if (comments&&comments.OnwerId.toString() === req.user._id.toString() && req.user._id.toString() !== notificationData[data].activity_by._id.toString()) {
                     var notify = notificationData[data].toObject();
                     notify.comment = comments
 
                     ToBeInserted.push(notify)
                 }
+            }
                 else if (notificationData[data].activity === "RepliedOnCommentLike") {
                     let ReplycommentsData = comments.ReplyComment.find(id => id._id.toString() === notificationData[data].Replycomment_id.toString())
                
@@ -104,13 +105,14 @@ exports.getAllNotification = async (req, res, next) => {
 
                 let comments = PostData.post_id.Comments.find(a => a._id.toString() === notificationData[data].comment_id.toString());
 
-
+                if (notificationData[data].activity === "CommentLike"||notificationData[data].activity === "RepliedOnComment") {
                 if (comments&&comments.OnwerId.toString() === req.user._id.toString() && req.user._id.toString() !== notificationData[data].activity_by._id.toString()) {
                     var notify = notificationData[data].toObject();
                     notify.comment = comments
 
                     ToBeInserted.push(notify)
                 }
+            }
                 else if (notificationData[data].activity === "RepliedOnCommentLike") {
                     let ReplycommentsData = comments.ReplyComment.find(id => id._id.toString() === notificationData[data].Replycomment_id.toString())
                     if (ReplycommentsData&&ReplycommentsData.OnwerId.toString() === req.user._id.toString() && req.user._id.toString() !== notificationData[data].activity_by._id.toString()) {

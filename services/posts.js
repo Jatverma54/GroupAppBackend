@@ -6,6 +6,10 @@ var postModel = require('./../model/posts');
 var NotificationModel = require('./../model/notifications');
 const CONSTANT = require('./../common/constant');
 var s3BucketConfig = require('./../common/s3_bucket_config');
+const expoNotification = require('./../common/expoSendNotifications');
+
+//expoNotification.sendNotification()
+
 
 exports.addNewPost = async (req, res, next) => {
     try {
@@ -94,6 +98,8 @@ function savePostInDB(req, res,) {
                 notificationData.save();
                 res.status(201).send({ message: "Data saved successfully.", result, })
                 //console.log(result, "Resultttttttttt")
+             
+             
             }
 
 
@@ -359,6 +365,18 @@ exports.deleteDataAndUserfromGroup = async (req, res) => {
             }
         }
         const RemoveNotification= await NotificationModel.deleteMany({post_id:req.body.postId})
+
+        var notify = {
+ 
+            group_id: req.body.groupid,
+            activity_byName: req.user.profile.full_name,
+            notificationType: "Deleted from Group",
+            SelectedUsersExpoTokens: userdata.ExpopushToken
+            
+        }
+       
+ 
+        expoNotification.sendNotification(notify)
     } catch (err) {
         console.log(err)
         res.status(400).json({ message: err });
@@ -375,6 +393,9 @@ exports.like = async (req, res) => {
         if (req.body.isLiked) {
             PostData.likedBy.push(req.user._id);
 
+            PostData.save();
+            res.status(200).send("Liked Array updated");
+
             var notify = {
 
                 group_id: PostData.GroupId,
@@ -386,17 +407,21 @@ exports.like = async (req, res) => {
             }
             var notificationData = new NotificationModel(notify);
             notificationData.save();
+           
+            expoNotification.sendNotification(notify)
+    
 
         } else {
             PostData.likedBy = PostData.likedBy.filter(a => a.toString() !== req.user._id.toString())
-
+            PostData.save();
+            res.status(200).send("Liked Array updated");
             const RemoveNotification= await NotificationModel.remove({post_id:PostId, activity_by: req.user._id, activity: "PostLikedBy"})
            
+       
+
         }
 
-        PostData.save();
-        res.status(200).send("Liked Array updated");
-
+       
     } catch (err) {
         //console.log(err)
         res.status(500).send({ error: "Something went wrong" });
@@ -459,10 +484,12 @@ exports.addNewComment = async (req, res) => {
             comment_id:req.body.commentId
            
         }
-        var notificationData = new NotificationModel(notify);
-        notificationData.save();
         res.status(200).send("Comments updated successfully");
 
+        var notificationData = new NotificationModel(notify);
+        notificationData.save();
+        
+        expoNotification.sendNotification(notify)
     } catch (err) {
         console.log("*****err", err);
         res.status(500).send({ error: "Comments are not getting updated" });
@@ -537,7 +564,8 @@ exports.Commentslike = async (req, res) => {
 
         if (req.body.isLiked) {
             commentsData.LikedBy.push(req.user._id);
-
+            PostData.save();
+            res.status(200).send("Comment Liked Array updated");
             var notify = {
 
                 group_id: PostData.GroupId,
@@ -550,13 +578,14 @@ exports.Commentslike = async (req, res) => {
             var notificationData = new NotificationModel(notify);
             notificationData.save();
 
+  expoNotification.sendNotification(notify)
         } else {
             commentsData.LikedBy = commentsData.LikedBy.filter(a => a.toString() !== req.user._id.toString())
+            PostData.save();
+            res.status(200).send("Comment Liked Array updated");
             const RemoveNotification= await NotificationModel.remove({post_id:PostId,comment_id:req.body.commentId, activity_by: req.user._id, activity: "CommentLike"})
+       
         }
-
-        PostData.save();
-        res.status(200).send("Comment Liked Array updated");
 
     } catch (err) {
         console.log(err)
@@ -691,7 +720,7 @@ exports.addNewReplyComment = async (req, res) => {
         commentData.ReplyComment = commentData.ReplyComment.concat({ comment: comment, LikedBy: [], OnwerId: req.user._id, createdAt: Date.now })//name: result.GroupName,
 
         PostData.save();
-
+        res.status(200).send("Reply Comments updated successfully");
         var notify = {
 
             group_id: PostData.GroupId,
@@ -706,8 +735,8 @@ exports.addNewReplyComment = async (req, res) => {
 
 
 
-        res.status(200).send("Reply Comments updated successfully");
-
+     
+        expoNotification.sendNotification(notify)
     } catch (err) {
         console.log("*****err", err);
         res.status(500).send({ error: "Comments are not getting updated" });
@@ -727,7 +756,10 @@ exports.replyCommentslike = async (req, res) => {
 
         if (req.body.isLiked) {
             ReplycommentsData.LikedBy.push(req.user._id);
-            
+
+            PostData.save();
+            res.status(200).send("Reply Comment Liked Array updated");
+
         var notify = {
  
             group_id: PostData.GroupId,
@@ -740,17 +772,16 @@ exports.replyCommentslike = async (req, res) => {
         }
         var notificationData = new NotificationModel(notify);
         notificationData.save();
+ 
+        expoNotification.sendNotification(notify)
         
         } else {
             ReplycommentsData.LikedBy = ReplycommentsData.LikedBy.filter(a => a.toString() !== req.user._id.toString())
+            PostData.save();
+            res.status(200).send("Reply Comment Liked Array updated");
         }
 
-        PostData.save();
-
-
-
-        res.status(200).send("Reply Comment Liked Array updated");
-
+      
     } catch (err) {
         console.log(err)
         res.status(500).send({ error: "Something went wrong" });

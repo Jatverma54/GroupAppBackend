@@ -6,6 +6,8 @@ const uploadFile = require('./../common/s3_bucket_config');
 const CONSTANT = require('./../common/constant');
 const s3Config = require('./../common/s3_bucket_config');
 const bcrypt = require('bcrypt');
+const expoNotification = require('./../common/expoSendNotifications');
+
 exports.addUser = function (req, res, next) {
     try {
         // uploadFile("C:/Users/snagdeote/Desktop/New folder/Groupapp_project/develop/images/promo-image.jpg", req.body.username)
@@ -97,7 +99,7 @@ exports.loginUser = async (req, res) => {
     try {
 
         const user = await UserModel.findByCredentials(req.body.username, req.body.password)
-        const token = await user.generateAuthToken()
+        const token = await user.generateAuthToken(req.body.ownerPushToken)
         res.status(200).send({ user, token })
 
     } catch (err) {
@@ -285,7 +287,7 @@ exports.adduserTogroup = async (req, res) => {
 
     try {
         // const groupData = await groupModel.findById(req.body._id);
-
+var ExpoTokens=[];
         for(var data in req.body.SelectedUsers){
         const UserData = await UserModel.findById(req.body.SelectedUsers[data]._id);
        
@@ -294,10 +296,32 @@ exports.adduserTogroup = async (req, res) => {
 
             UserData.joined_groups = UserData.joined_groups.concat({ groupid: req.body.groupid})//name: result.GroupName,GroupCategoryid: req.body.GroupCategory_id 
             await UserData.save()
+            ExpoTokens.push(UserData.ExpopushToken)
         }
     
         }
         res.status(200).json({ message: "Users added to group" });
+
+
+        if(ExpoTokens.length!==0){
+          
+            var notify = {
+ 
+                group_id: req.body.groupid,
+                activity_byName: req.user.profile.full_name,
+                notificationType: "Added to Group",
+                SelectedUsersExpoTokens: ExpoTokens
+                
+            }
+           
+     
+            expoNotification.sendNotification(notify)
+        
+        }
+
+     
+
+
     } catch (err) {
         console.log(err)
         res.status(400).json({ message: err });

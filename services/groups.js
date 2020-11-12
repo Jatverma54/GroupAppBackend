@@ -9,6 +9,7 @@ const CONSTANT = require('./../common/constant');
 const { response } = require('express');
 const { compareSync } = require('bcrypt');
 var s3BucketConfig = require('./../common/s3_bucket_config');
+const expoNotification = require('./../common/expoSendNotifications');
 
 exports.addNewGroup = async (req, res, next) => {
     try {
@@ -518,13 +519,30 @@ exports.AdmindeleteUserfromtheGroup = async (req, res) => {
         if (req.body.isAdmin) {
             const groupdata = await groupModel.findOne({ _id: req.body.groupid });
             groupdata.admin_id = groupdata.admin_id.filter((groupid) => {
-                return groupid.toString() !== req.body.userId
+                return groupid.toString() !== req.body.userId.toString()
             })
             await groupdata.save();
         }
 
 
         res.status(200).json({ message: "Removed User from group: ", result: userdata });
+
+        
+       
+          
+            var notify = {
+ 
+                group_id: req.body.groupid,
+                activity_byName: req.user.profile.full_name,
+                notificationType: "Deleted from Group",
+                SelectedUsersExpoTokens: userdata.ExpopushToken
+                
+            }
+           
+     
+            expoNotification.sendNotification(notify)
+        
+        
     } catch (err) {
         console.log(err)
         res.status(400).json({ message: err });
@@ -540,7 +558,7 @@ exports.DismissUserAsAdmin = async (req, res) => {
 
         const groupdata = await groupModel.findOne({ _id: req.body.groupid });
         groupdata.admin_id = groupdata.admin_id.filter((groupid) => {
-            return groupid.toString() !== req.body.userId
+            return groupid.toString() !== req.body.userId.toString()
         })
         await groupdata.save();
 
@@ -563,6 +581,17 @@ exports.MakeUserAsAdmin = async (req, res) => {
         await groupdata.save();
 
         res.status(200).json({ message: "User as Admin: ", result: groupdata });
+
+        var notify = {
+ 
+            groupdata: groupdata,
+            New_admin: req.body.userId,
+            notificationType: "Make admin",
+           
+            
+        }
+ 
+        expoNotification.sendNotification(notify)
     } catch (err) {
         console.log(err)
         res.status(400).json({ message: err });
@@ -650,7 +679,7 @@ exports.leaveGroup = async (req, res) => {
         if (req.body.isAdmin) {
             const groupdata = await groupModel.findOne({ _id: req.body.groupid });
             groupdata.admin_id = groupdata.admin_id.filter((groupid) => {
-                return groupid.toString() !== req.user._id
+                return groupid.toString() !== req.user._id.toString()
             })
             await groupdata.save();
         }

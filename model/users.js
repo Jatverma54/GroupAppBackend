@@ -58,17 +58,20 @@ var UserModelSchema = new mongoose.Schema({
             required: true
         }
     }],
+    ExpopushToken:{},
     resetCode:  {
         type: Number,
         },
     isActive: { type: Boolean, required: true, default: false }
 },{timestamps:true});
 
-UserModelSchema.methods.generateAuthToken = async function () {
+UserModelSchema.methods.generateAuthToken = async function (ownerPushToken) {
     const user = this
     const token = jwt.sign({ _id: user._id.toString() }, 'HardWorkAlwaysPayOff')
 
     user.tokens = user.tokens.concat({ token })
+
+    user.ExpopushToken=ownerPushToken
     await user.save()
 
     return token
