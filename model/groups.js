@@ -5,7 +5,7 @@ var uniqueValidator = require('mongoose-unique-validator');
 var Schema = mongoose.Schema;
 
 var groupModelSchema = new Schema({
-    GroupName: { type: String, required: true, unique: true, trim: true, },
+    GroupName: { type: String, required: true,  trim: true, },
     group_Bio:{ type: String, trim: true,},
     group_type: { type: String, required: true,  trim: true, },
     GroupCategory:{ type: String,  },
@@ -22,7 +22,8 @@ var groupModelSchema = new Schema({
    // RequestedBy: [{type:Schema.Types.ObjectId}],
    isRequested:{ type: Boolean},
   countMembers:{type:Number},
-LastUpdated: { type: Date,  default:Date.now }
+LastUpdated: { type: Date,  default:Date.now },
+currentUser:{ type:Schema.Types.ObjectId}
 
 },{timestamps:true});
 

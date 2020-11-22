@@ -119,6 +119,7 @@ exports.getPublicGroupsWithCategory = async (req, res) => {
             //await UserModel.countDocuments({ "joined_groups.groupid": groupData[data]._id });
            
           await  groupData[data].populate(['admin_id']).execPopulate()
+          groupData[data].currentUser=req.user._id
         }
 
         res.status(200).json({ message: "Data: ", result: groupData });

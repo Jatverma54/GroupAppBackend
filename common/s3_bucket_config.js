@@ -14,6 +14,22 @@ const s3 = new AWS.S3({
     secretAccessKey: SECRET
 });
 
+function generator() {
+
+  const ran1 = () => [1, 2, 3, 4, 5, 6, 7, 8, 9, 0].sort((x, z) => {
+      ren = Math.random();
+      if (ren == 0.5) return 0;
+      return ren > 0.5 ? 1 : -1
+  })
+  const ran2 = () => ran1().sort((x, z) => {
+      ren = Math.random();
+      if (ren == 0.5) return 0;
+      return ren > 0.5 ? 1 : -1
+  })
+
+  return Array(6).fill(null).map(x => ran2()[(Math.random() * 9).toFixed()]).join('')
+}
+
 exports.uploadFile = (fileName, userName,BUCKET_NAME) => {
     return new Promise (async function(resolve, reject){
         // Read content from the file
@@ -38,12 +54,12 @@ exports.uploadFile = (fileName, userName,BUCKET_NAME) => {
 
  
      const {ext,mime}=mimeInfo;
-
+ var randomNumber=generator();
       //  const imageExtension = path.extname(fileName);
         // Setting up S3 upload parameters
         const params = {
             Bucket: BUCKET_NAME,
-            Key: userName+"_"+Date.now+"."+ext,//+imageExtension, // File name you want to save as in S3
+            Key: userName+"_"+Date.now()+"_"+randomNumber+"."+ext,//+imageExtension, // File name you want to save as in S3
             Body: buffer,
             ACL:'public-read',
             ContentEncoding: 'base64',
