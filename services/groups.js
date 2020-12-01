@@ -336,9 +336,12 @@ exports.getJoinedPublicGroups = async (req, res) => {
                 groupObject.currentUser = req.user._id;
 
                 ToBeInserted.data.push({ groupObject })
+               
             }
-
-            Response.push(ToBeInserted)
+if(groupData.length!==0){
+    Response.push(ToBeInserted)
+}
+           
         }
 
 

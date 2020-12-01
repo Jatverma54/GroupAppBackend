@@ -126,6 +126,11 @@ exports.getAllPostofGroupFromNotification = async (req, res) => {
             postdataObject.countLikes = postData.likedBy.length;
             postdataObject.countcomments = postData.Comments.length;
             postdataObject.GroupName = postData.GroupId.GroupName;
+            postdataObject.GroupOwnerId = postData.GroupId.owner_id;
+            postdataObject.AllPublicFeed = true;
+            postdataObject.Groupid = postData.GroupId._id;
+            postdataObject.admin_id =  postData.GroupId.admin_id;
+
             postdataObject.GroupAdmin = postData.GroupId.admin_id;
             postdataObject.isLiked = postData.likedBy.find(a => a.toString() === req.user._id.toString()) ? true : false;
             postdataObject.currentUser = req.user._id;
@@ -186,6 +191,7 @@ exports.getAllPostofGroup = async (req, res) => {
             postdataObject.countLikes = postData[data].likedBy.length;
             postdataObject.countcomments = postData[data].Comments.length;
             postdataObject.GroupName = group.GroupName;
+          
             postdataObject.GroupAdmin = group.admin_id;
             postdataObject.isLiked = postData[data].likedBy.find(a => a.toString() === req.user._id.toString()) ? true : false;
             postdataObject.currentUser = req.user._id;
@@ -871,6 +877,7 @@ exports.getAllPublicJoinedPostofGroup = async (req, res) => {
                     postdataObject.countLikes = postData[data].likedBy.length;
                     postdataObject.countcomments = postData[data].Comments.length;
                     postdataObject.GroupName = group.GroupName;
+                    postdataObject.GroupOwnerId = group.owner_id;
                     postdataObject.AllPublicFeed = true;
                     postdataObject.Groupid = group._id;
                     postdataObject.GroupAdmin = group.admin_id;
