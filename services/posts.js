@@ -96,7 +96,7 @@ function savePostInDB(req, res,) {
                 }
                 var notificationData = new NotificationModel(notify);
                 notificationData.save();
-                res.status(201).send({ message: "Data saved successfully.", result, })
+                res.status(201).send({ message: "Data saved successfully.", result:"", })
                 //console.log(result, "Resultttttttttt")
              
              
@@ -136,7 +136,7 @@ exports.getAllPostofGroupFromNotification = async (req, res) => {
             postdataObject.currentUser = req.user._id;
             postdataObject.currentUserPic = req.user.profile.profile_pic;
             //To Be Changed
-            var userData = await postData.populate('OnwerId').execPopulate()
+            var userData = await postData.populate({path:'OnwerId',select:['username','profile.full_name','profile.profile_pic']}).execPopulate()
 
             // var userData=await UserModel.findById(postdataObject.OnwerId);
             postdataObject.OnwerProfilePic = userData.OnwerId.profile.profile_pic;
@@ -146,7 +146,7 @@ exports.getAllPostofGroupFromNotification = async (req, res) => {
             let toBeInserted = [];
             if (postData.likedBy.length !== 0) {
 
-                const userData = await postData.populate(['likedBy']).execPopulate()
+                const userData = await postData.populate({path:'likedBy',select:['username','profile.full_name','profile.profile_pic']}).execPopulate()
 
                 for (var i = 0; i < userData.likedBy.length; i++) {
                     if (i <= 5) {
@@ -197,7 +197,7 @@ exports.getAllPostofGroup = async (req, res) => {
             postdataObject.currentUser = req.user._id;
             postdataObject.currentUserPic = req.user.profile.profile_pic;
             //To Be Changed
-            var userData = await postData[data].populate('OnwerId').execPopulate()
+            var userData = await postData[data].populate({path:'OnwerId',select:['username','profile.full_name','profile.profile_pic']}).execPopulate()
 
             // var userData=await UserModel.findById(postdataObject.OnwerId);
             postdataObject.OnwerProfilePic = userData.OnwerId.profile.profile_pic;
@@ -207,7 +207,7 @@ exports.getAllPostofGroup = async (req, res) => {
             let toBeInserted = [];
             if (postData[data].likedBy.length !== 0) {
 
-                const userData = await postData[data].populate(['likedBy']).execPopulate()
+                const userData = await postData[data].populate({path:'likedBy',select:['username','profile.full_name','profile.profile_pic']}).execPopulate()
 
                 for (var i = 0; i < userData.likedBy.length; i++) {
                     if (i <= 5) {
@@ -269,7 +269,7 @@ exports.getAllUserPostofGroup = async (req, res) => {
 
             let toBeInserted = [];
             if (postData[data].likedBy.length !== 0) {
-                const userData = await postData[data].populate(['likedBy']).execPopulate()
+                const userData = await postData[data].populate({path:'likedBy',select:['username','profile.full_name','profile.profile_pic']}).execPopulate()
                 for (var i = 0; i < userData.likedBy.length; i++) {
                     if (i <= 5) {
                         //   const userData = await UserModel.findById(postData[data].likedBy[i]);
@@ -348,7 +348,7 @@ exports.deleteDataAndUserfromGroup = async (req, res) => {
             await groupdata.save();
         }
 
-        res.status(200).json({ message: "Removed Group: ", result: RemovedData });
+        res.status(200).json({ message: "Removed Group: ", result: "" });
         if(postData.image && postData.image.length > 0){
             var fileArr = postData.image;
             s3BucketConfig.removeMultipleFilesFromS3(fileArr, CONSTANT.PostMediaBucketName, function(err, data){
@@ -443,7 +443,7 @@ exports.viewlikes = async (req, res) => {
         var PostData = await postModel.findById(PostId);
         LikedUser = []
         if (PostData.likedBy.length !== 0) {
-              var userData =await PostData.populate(['likedBy']).execPopulate()
+              var userData =await PostData.populate({path:'likedBy',select:['username','profile.full_name','profile.profile_pic']}).execPopulate()
      
        userData.likedBy= paginate(userData.likedBy,req.query.page_size,req.query.page_number)
 
@@ -617,7 +617,7 @@ exports.viewCommentlikes = async (req, res) => {
 
             for (var data in commentsData.LikedBy) {
 
-                var userData = await UserModel.findById(commentsData.LikedBy[data]);
+                var userData = await UserModel.findById(commentsData.LikedBy[data],{username:1,'profile.full_name':1,'profile.profile_pic':1});
                 LikedUser.push(userData);
             }
 
@@ -646,7 +646,7 @@ exports.deleteComment = async (req, res) => {
 
         PostData.save();
         const RemoveNotification= await NotificationModel.deleteMany({post_id:PostId, comment_id:req.body.commentId})
-        res.status(200).send({ result: PostData });
+        res.status(200).send({ result: "" });
 
     } catch (err) {
         console.log(err)
@@ -813,7 +813,7 @@ exports.viewReplyCommentlikes = async (req, res) => {
 
             for (var data in ReplycommentsData.LikedBy) {
 
-                var userData = await UserModel.findById(ReplycommentsData.LikedBy[data]);
+                var userData = await UserModel.findById(ReplycommentsData.LikedBy[data],{username:1,'profile.full_name':1,'profile.profile_pic':1});
                 LikedUser.push(userData);
             }
 
@@ -890,7 +890,7 @@ exports.getAllPublicJoinedPostofGroup = async (req, res) => {
                     //To Be Changed
                     // var userData=await UserModel.findById(postdataObject.OnwerId);
 
-                    var userData = await postData[data].populate('OnwerId').execPopulate()
+                    var userData = await postData[data].populate({path:'OnwerId',select:['username','profile.full_name','profile.profile_pic']}).execPopulate()
 
                     postdataObject.OnwerProfilePic = userData.OnwerId.profile.profile_pic;
                     postdataObject.OnwerName = userData.OnwerId.profile.full_name;
@@ -898,7 +898,7 @@ exports.getAllPublicJoinedPostofGroup = async (req, res) => {
 
                     let toBeInserted = [];
                     if (postData[data].likedBy.length !== 0) {
-                        const userData = await postData[data].populate(['likedBy']).execPopulate()
+                        const userData = await postData[data].populate({path:'likedBy',select:['username','profile.full_name','profile.profile_pic']}).execPopulate()
                         for (var i = 0; i < userData.likedBy.length; i++) {
                             if (i <= 5) {
                                 //  const userData = await UserModel.findById(postData[data].likedBy[i]);

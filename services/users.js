@@ -12,7 +12,7 @@ exports.addUser = function (req, res, next) {
     try {
         // uploadFile("C:/Users/snagdeote/Desktop/New folder/Groupapp_project/develop/images/promo-image.jpg", req.body.username)
         if (req.body.profile && req.body.profile.profilePic) {
-            uploadFile(req.body.profile.profilePic, req.body.username, CONSTANT.ProfilePictureBucketName)
+            s3Config.uploadFile(req.body.profile.profilePic, req.body.username, CONSTANT.ProfilePictureBucketName)
                 .then(picLocation => saveUserInDB(req, res, picLocation))
                 .catch(function (e) {
                     //console.log("Failed to upload profile pic", e);
@@ -22,6 +22,7 @@ exports.addUser = function (req, res, next) {
             saveUserInDB(req, res, CONSTANT.PlaceholderImageUrl)
         }
     } catch (e) {
+        console.log(e,"ssssssssssss")
         res.status(500).send({ error: "Something went wrong" });
     }
 }
@@ -36,9 +37,31 @@ function saveUserInDB(req, res, picLocation) {
             //console.log("*****err", err);
             if (err.errors&&err.errors.email !== undefined) {
                 res.status(400).send({ error: "Email Id already exist" })
+
+
+                const filename = picLocation.split('/').slice(-1)[0];
+      
+                s3Config.removeFileFromS3(filename, CONSTANT.ProfilePictureBucketName, function(err, res){
+                    if(err){
+                        console.log("Unable to delete older image from S3.");
+                    } else {
+                        console.log("Removed older image from S3 successfully.");
+                    }
+                });
+
             }
             else if (err.errors&&err.errors.username !== undefined) {
                 res.status(400).send({ error: "Username already exist" });
+                
+                const filename = picLocation.split('/').slice(-1)[0];
+      
+                s3Config.removeFileFromS3(filename, CONSTANT.ProfilePictureBucketName, function(err, res){
+                    if(err){
+                        console.log("Unable to delete older image from S3.");
+                    } else {
+                        console.log("Removed older image from S3 successfully.");
+                    }
+                });
             }
         } else {
             //console.log("result", result);
@@ -66,7 +89,7 @@ function saveUserInDB(req, res, picLocation) {
                     res.status(400).send({ error: "Unable to register. Internal error occured." });
                 } else {
                     //console.log("mail success");
-                    res.status(201).send({ message: "Data saved successfully.", result })
+                    res.status(201).send({ message: "Data saved successfully.", result:"" })
                 }
             });
 
@@ -156,7 +179,7 @@ exports.updateUserImage = async (req, res) => {
                     }
                 });
 
-                var userData=await UserModel.findById(UserId);
+                var userData=await UserModel.findById(UserId,{username:1,'profile.full_name':1,'profile.profile_pic':1});
         
                 res.status(200).send({result:userData});
                
@@ -187,7 +210,7 @@ exports.updateUserinformation = async (req, res) => {
             _id: req.user._id,
         }, { $set: { username, "profile.full_name":full_name } });
       
-      var userData=await UserModel.findById(req.user._id);
+      var userData=await UserModel.findById(req.user._id,{username:1,'profile.full_name':1,'profile.profile_pic':1});
         
         res.status(200).send({result:userData});
  
@@ -251,7 +274,7 @@ exports.userSearchQuery = async (req, res) => {
                 //     "username": { "$regex": req.body.userSearchQuery, "$options": "i" }
                 // }},
                 { "$match": {
-                    "profile.full_name": { "$regex": req.body.userSearchQuery, "$options": "i" }
+                    "username": { "$regex": req.body.userSearchQuery, "$options": "i" }
                 }},
 
                 
@@ -375,7 +398,7 @@ await UserData.save()
                     res.status(400).send({ error: "Unable to send confirmation code. Internal error occured." });
                 } else {
                     //console.log("mail success");
-                    res.status(200).json({ message: "Confirmation code sent",result: UserData});
+                    res.status(200).json({ message: "Confirmation code sent",result: UserData._id});
                 }
             });
             
@@ -398,10 +421,10 @@ exports.AuthenticateConfirmationCode = async (req, res) => {
 
     try {
         const UserData = await UserModel.findById(req.body.Userid);
-        
+      
         if(UserData.resetCode===req.body.confrimationCode){
 
-            res.status(200).json({ message: "Confirmation code Verified",result: UserData});
+            res.status(200).json({ message: "Confirmation code Verified",result: UserData._id});
 
 UserData.resetCode=""
 

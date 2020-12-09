@@ -20,7 +20,7 @@ exports.getNotification = async (req, res, next) => {
         let ToBeInserted = []
 
         for (var data in notificationData) {
-            var userData = await notificationData[data].populate('activity_by').execPopulate();
+            var userData = await notificationData[data].populate({path:'activity_by',select:['username','profile.full_name','profile.profile_pic']}).execPopulate();
             var PostData = await notificationData[data].populate('post_id').execPopulate();
 
             if (notificationData[data].notificationType === "all" && req.user._id.toString() !== notificationData[data].activity_by._id.toString()) {
@@ -78,14 +78,18 @@ exports.getNotification = async (req, res, next) => {
 exports.getAllNotification = async (req, res, next) => {
     try {
         let ToBeInserted = []
-        for (var data in req.user.joined_groups) {
+        GroupData =await req.user.populate('joined_groups.groupid').execPopulate();
+    
+        groupData = GroupData.joined_groups.filter(a => a.groupid.group_type.toString() === "public")
 
-
-            var notificationData = await NotificationModel.find({ group_id:req.user.joined_groups[data].groupid  }).limit(50).sort('-createdAt').exec()
+        for (var data in groupData) {
+           
+           
+            var notificationData = await NotificationModel.find({ group_id:groupData[data].groupid._id  }).limit(50).sort('-createdAt').exec()
             notificationData= paginate(notificationData,req.query.page_size,req.query.page_number)
 
         for (var data in notificationData) {
-            var userData = await notificationData[data].populate('activity_by').execPopulate();
+            var userData = await notificationData[data].populate({path:'activity_by',select:['username','profile.full_name','profile.profile_pic']}).execPopulate();
             var PostData = await notificationData[data].populate('post_id').execPopulate();
 
             if (notificationData[data].notificationType === "all" && req.user._id.toString() !== notificationData[data].activity_by._id.toString()) {
@@ -127,7 +131,7 @@ exports.getAllNotification = async (req, res, next) => {
 
             }
         }
-    }
+    } 
         res.status(200).send({ message: "Notifications", result: ToBeInserted })
    
     } catch (err) {

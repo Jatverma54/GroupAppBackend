@@ -70,7 +70,7 @@ function savegroupInDB(req, res, picLocation) {
                 req.user.created_groups = req.user.created_groups.concat({ groupid: result._id })//name: result.GroupName 
                 await req.user.save();
 
-                res.status(201).send({ message: "Data saved successfully.", result, })
+                res.status(201).send({ message: "Data saved successfully.", result:"", })
 
 
                 //console.log(result, "Resultttttttttt")
@@ -118,7 +118,7 @@ exports.getPublicGroupsWithCategory = async (req, res) => {
              groupData[data].countMembers=count.groupList.length;
             //await UserModel.countDocuments({ "joined_groups.groupid": groupData[data]._id });
            
-          await  groupData[data].populate(['admin_id']).execPopulate()
+          await  groupData[data].populate({path:'admin_id',select:['username','profile.full_name','profile.profile_pic']}).execPopulate()
           groupData[data].currentUser=req.user._id
         }
 
@@ -209,7 +209,7 @@ exports.viewGroupMembers = async (req, res) => {
 
         const groupData = await groupModel.findOne({ _id: req.body.groupid });
 
-        var filteredArray = await UserModel.find({ "joined_groups.groupid": groupData._id, });
+        var filteredArray = await UserModel.find({ "joined_groups.groupid": groupData._id},{username:1,'profile.full_name':1,'profile.profile_pic':1});
 
        
         filteredArray= paginate(filteredArray,req.query.page_size,req.query.page_number)
@@ -230,7 +230,7 @@ exports.viewGroupMembers = async (req, res) => {
         }
         //  filteredArray[data].subElements = {"groupid": groupid};
         // //console.log(groupData.admin_id,"ssss")
-        //console.log(filteredArray)
+      //  console.log(filteredArray)
 
         res.status(200).json({ message: "Group Members: ", result: filteredArray });
     } catch (err) {
@@ -325,7 +325,7 @@ exports.getJoinedPublicGroups = async (req, res) => {
                 // //console.log(groupData)
                 var count  = await groupData[data].populate('groupList').execPopulate();
                 groupData[data].countMembers=count.groupList.length;
-                await  groupData[data].populate(['admin_id']).execPopulate()
+                await  groupData[data].populate({path:'admin_id',select:['username','profile.full_name','profile.profile_pic']}).execPopulate()
                //await UserModel.countDocuments({ "joined_groups.groupid": groupData[data]._id, });
 
                 const groupObject = groupData[data].toObject()
@@ -390,7 +390,7 @@ if(groupData.length!==0){
                             //   groups[groupDataArr].countMembers =
                             // await UserModel.countDocuments({ "joined_groups.groupid": groups[groupDataArr]._id, });
 
-                            await   groups[groupDataArr].populate(['admin_id']).execPopulate()
+                            await   groups[groupDataArr].populate({path:'admin_id',select:['username','profile.full_name','profile.profile_pic']}).execPopulate()
                             //const groupObject = groupData
                             // delete groupObject.GroupCategory_id;
                             // delete groupObject.admin_id;
@@ -417,7 +417,7 @@ if(groupData.length!==0){
             }
         }
 
-
+      
         res.status(200).json({ message: "Joined Groups : ", result: Response });
 
     } catch (err) {
@@ -529,7 +529,7 @@ exports.AdmindeleteUserfromtheGroup = async (req, res) => {
         }
 
 
-        res.status(200).json({ message: "Removed User from group: ", result: userdata });
+        res.status(200).json({ message: "Removed User from group: ", result: userdata._id });
 
         
        
@@ -610,7 +610,7 @@ exports.getAllGroupRequest = async (req, res) => {
     try {
         // const groupData = await groupModel.findById(req.body._id);
 
-        var UserData = await UserModel.find({ "Requested_groups.groupid": req.body.groupId });
+        var UserData = await UserModel.find({ "Requested_groups.groupid": req.body.groupId },{username:1,'profile.full_name':1,'profile.profile_pic':1,Requested_groups:1});
 
         UserData= paginate(UserData,req.query.page_size,req.query.page_number);
 
@@ -639,7 +639,7 @@ exports.confirmGroupRequest = async (req, res) => {
 
         await UserData.save()
 
-        res.status(200).json({ message: "Users Confirmed: ", result: UserData });
+        res.status(200).json({ message: "Users Confirmed: ", result: "" });
     } catch (err) {
         console.log(err)
         res.status(400).json({ message: err });
@@ -659,7 +659,7 @@ exports.removeGroupRequest = async (req, res) => {
         })
         await UserData.save()
 
-        res.status(200).json({ message: "Request Deleted: ", result: UserData });
+        res.status(200).json({ message: "Request Deleted: ", result: "" });
 
     } catch (err) {
         //console.log(err)
@@ -689,7 +689,7 @@ exports.leaveGroup = async (req, res) => {
         }
 
 
-        res.status(200).json({ message: "Removed User from group: ", result: req.user });
+        res.status(200).json({ message: "Removed User from group: ", result: "" });
     } catch (err) {
         console.log(err)
         res.status(400).json({ message: err });
@@ -710,7 +710,7 @@ exports.getJoinedPrivateGroups = async (req, res) => {
               
                // groupData[data].countMembers = await UserModel.countDocuments({ "joined_groups.groupid": groupData[data]._id, });
                var count  = await groupData[data].populate('groupList').execPopulate();
-               await   groupData[data].populate(['admin_id']).execPopulate()
+               await   groupData[data].populate({path:'admin_id',select:['username','profile.full_name','profile.profile_pic']}).execPopulate()
                groupData[data].countMembers=count.groupList.length;
                      
                 const groupObject = groupData[data].toObject()
@@ -850,7 +850,7 @@ exports.getPublicGroupListScreen = async (req, res) => {
     try {
 
         var groupData = await groupModel.findById(req.params.id)
-        await  groupData.populate(['admin_id']).execPopulate();
+        await  groupData.populate({path:'admin_id',select:['username','profile.full_name','profile.profile_pic']}).execPopulate();
 
         const groupObject = groupData.toObject()
         

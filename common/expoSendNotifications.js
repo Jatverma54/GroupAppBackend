@@ -53,7 +53,7 @@ exports.sendNotification= async(notify) =>{
         // comment_id:req.body.commentId
        
         var PostData = await postModel.findById(notify.post_id);
-        await PostData.populate('OnwerId').execPopulate();
+        await PostData.populate({path:'OnwerId',select:['username','profile.full_name','profile.profile_pic']}).execPopulate();
         await PostData.populate('GroupId').execPopulate();
 
         if (PostData.OnwerId._id.toString() !== notify.activity_by.toString() ) {
@@ -82,7 +82,7 @@ exports.sendNotification= async(notify) =>{
       // notificationType: "UserSpecificComments",
       // comment_id:req.body.commentId
       var PostData = await postModel.findById(notify.post_id);
-      await PostData.populate('OnwerId').execPopulate();
+      await PostData.populate({path:'OnwerId',select:['username','profile.full_name','profile.profile_pic']}).execPopulate();
       await PostData.populate('GroupId').execPopulate();
 
         let comments = PostData.Comments.find(a => a._id.toString() === notify.comment_id.toString());

@@ -27,6 +27,21 @@ currentUser:{ type:Schema.Types.ObjectId}
 
 },{timestamps:true});
 
+// groupModelSchema.methods.toJSON = function () {
+//   const groupModel = this
+//   console.log(groupModel)
+//   const userObject = groupModel.toObject()
+
+//   delete userObject.admin_id.password
+//   delete userObject.admin_id.tokens
+//   delete userObject.admin_id.created_groups
+//   delete userObject.admin_id.joined_groups
+//   delete userObject.admin_id.ExpopushToken
+//  // delete userObject.Requested_groups
+ 
+//   return userObject
+// }
+
 groupModelSchema.virtual('posts', {
   ref: 'postModel',
   localField: '_id',

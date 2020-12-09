@@ -91,8 +91,9 @@ UserModelSchema.methods.toJSON = function () {
     delete userObject.tokens
     delete userObject.created_groups
     delete userObject.joined_groups
+    delete userObject.ExpopushToken
    // delete userObject.Requested_groups
-
+   
     return userObject
 }
 
