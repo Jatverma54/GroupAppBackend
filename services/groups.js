@@ -116,12 +116,15 @@ exports.getPublicGroupsWithCategory = async (req, res) => {
             groupData[data].isJoined = req.user.joined_groups.find(a => a.groupid.toString() === groupData[data]._id.toString()) ? true : false;
            var count  = await groupData[data].populate('groupList').execPopulate();
              groupData[data].countMembers=count.groupList.length;
+             
+
             //await UserModel.countDocuments({ "joined_groups.groupid": groupData[data]._id });
            
           await  groupData[data].populate({path:'admin_id',select:['username','profile.full_name','profile.profile_pic']}).execPopulate()
           groupData[data].currentUser=req.user._id
         }
 
+        
         res.status(200).json({ message: "Data: ", result: groupData });
     } catch (err) {
         console.log(err)
@@ -861,7 +864,7 @@ exports.getPublicGroupListScreen = async (req, res) => {
             //await UserModel.countDocuments({ "joined_groups.groupid": groupData[data]._id });
            
          
-        
+     
 
         res.status(200).json({ message: "Data: ", result: [groupObject] });
     } catch (err) {
