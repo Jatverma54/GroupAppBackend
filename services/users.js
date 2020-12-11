@@ -161,7 +161,7 @@ exports.userInformation = async (req, res) => {
 exports.updateUserImage = async (req, res) => {
     try {
 
-        s3Config.uploadFile(req.body.image, req.body.UserId + "_" + req.user.username, CONSTANT.ProfilePictureBucketName)
+        s3Config.uploadFile(req.body.image, req.user._id + "_" + req.user.username, CONSTANT.ProfilePictureBucketName)
             .then(async picLocation => {
 
                 var UserId = req.user._id;
