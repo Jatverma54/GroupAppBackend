@@ -16,7 +16,7 @@ router.post('/', function(req, res){
     });
 });
 
-router.get('/', function(req, res){
+router.get('/',auth, function(req, res){
     //console.log("****User data");
     userObj.getData(req,res);
 });

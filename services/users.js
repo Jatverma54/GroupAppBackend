@@ -123,6 +123,7 @@ exports.loginUser = async (req, res) => {
 
         const user = await UserModel.findByCredentials(req.body.username, req.body.password)
         const token = await user.generateAuthToken(req.body.ownerPushToken)
+      
         res.status(200).send({ user, token })
 
     } catch (err) {

@@ -136,6 +136,10 @@ exports.getPublicGroupsWithCategory = async (req, res) => {
 exports.deleteData = async (req, res) => {
     try {
         const GroupData = await groupModel.findById(req.params.id);
+
+
+if(GroupData.owner_id.toString()===req.user._id.toString()){ 
+
         const RemovedData = await groupModel.remove({ _id: req.params.id });
       
 
@@ -200,6 +204,11 @@ exports.deleteData = async (req, res) => {
             const RemoveNotification= await NotificationModel.deleteMany({post_id:postData[data]._id});
         }
         await postModel.deleteMany({ GroupId: req.params.id })//changes
+    }
+    else{
+        res.status(400).json({ message: "Not Authorized" });
+    }
+
     } catch (err) {
         console.log(err)
         res.status(400).json({ message: err });
@@ -233,7 +242,7 @@ exports.viewGroupMembers = async (req, res) => {
         }
         //  filteredArray[data].subElements = {"groupid": groupid};
         // //console.log(groupData.admin_id,"ssss")
-      //  console.log(filteredArray)
+       // console.log(filteredArray)
 
         res.status(200).json({ message: "Group Members: ", result: filteredArray });
     } catch (err) {
@@ -833,9 +842,16 @@ exports.groupSearchQuery = async (req, res) => {
                       results[data].isJoined = req.user.joined_groups.find(a => a.groupid.toString() === results[data]._id.toString()) ? true : false;
                       results[data].CategoryImage=groupCategoryImage.image
                     
-                   
+                      var GroupdData = await groupModel.findById(results[data]._id);
+
+                var AdminData=  await  GroupdData.populate({path:'admin_id',select:['username','profile.full_name','profile.profile_pic']}).execPopulate()
+                   results[data].admin_id = AdminData.admin_id;
+                    results[data].currentUser= req.user._id;
+
+              
+                      
                 }
-               
+              // console.log(results)
                     res.status(200).json({ message: "Joined Groups : ", result:results});
                 }
             }
