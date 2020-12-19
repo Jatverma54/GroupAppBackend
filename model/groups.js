@@ -9,7 +9,6 @@ var groupModelSchema = new Schema({
     group_Bio:{ type: String, trim: true,},
     group_type: { type: String, required: true,  trim: true, },
     GroupCategory:{ type: String,  },
-    //groupMembers:[{type:Schema.Types.ObjectId,required:true}],
     GroupCategory_id: { type:Schema.Types.ObjectId,ref:"CategoryModel"},
     privacy: { type: String,   trim: true, },
     owner_id: {type:Schema.Types.ObjectId,required:true, },//ref: 'UserModel'
@@ -19,28 +18,12 @@ var groupModelSchema = new Schema({
     post:[Object],
     GroupAdminName:[{type: String}], 
     isJoined:{ type: Boolean},
-   // RequestedBy: [{type:Schema.Types.ObjectId}],
    isRequested:{ type: Boolean},
   countMembers:{type:Number},
 LastUpdated: { type: Date,  default:Date.now },
 currentUser:{ type:Schema.Types.ObjectId}
 
 },{timestamps:true});
-
-// groupModelSchema.methods.toJSON = function () {
-//   const groupModel = this
-//   console.log(groupModel)
-//   const userObject = groupModel.toObject()
-
-//   delete userObject.admin_id.password
-//   delete userObject.admin_id.tokens
-//   delete userObject.admin_id.created_groups
-//   delete userObject.admin_id.joined_groups
-//   delete userObject.admin_id.ExpopushToken
-//  // delete userObject.Requested_groups
- 
-//   return userObject
-// }
 
 groupModelSchema.virtual('posts', {
   ref: 'postModel',

@@ -10,84 +10,69 @@ const CONSTANT = require('./../common/constant');
 //const BUCKET_NAME = 'groupappproject/ProfilePictures';
 
 const s3 = new AWS.S3({
-    accessKeyId: ID,
-    secretAccessKey: SECRET
+  accessKeyId: ID,
+  secretAccessKey: SECRET
 });
 
 function generator() {
 
   const ran1 = () => [1, 2, 3, 4, 5, 6, 7, 8, 9, 0].sort((x, z) => {
-      ren = Math.random();
-      if (ren == 0.5) return 0;
-      return ren > 0.5 ? 1 : -1
+    ren = Math.random();
+    if (ren == 0.5) return 0;
+    return ren > 0.5 ? 1 : -1
   })
   const ran2 = () => ran1().sort((x, z) => {
-      ren = Math.random();
-      if (ren == 0.5) return 0;
-      return ren > 0.5 ? 1 : -1
+    ren = Math.random();
+    if (ren == 0.5) return 0;
+    return ren > 0.5 ? 1 : -1
   })
 
   return Array(6).fill(null).map(x => ran2()[(Math.random() * 9).toFixed()]).join('')
 }
 
-exports.uploadFile = (fileName, userName,BUCKET_NAME) => {
-    return new Promise (async function(resolve, reject){
-        // Read content from the file
-     //   const fileContent = fileName;//fs.readFileSync(fileName);
-  
-    //  const mimeInfo = fileType(Buffer.from(fileName, 'base64'))
+exports.uploadFile = (fileName, userName, BUCKET_NAME) => {
+  return new Promise(async function (resolve, reject) {
 
-    //  //console.log(mimeInfo)
 
-    //  const contents = fs.readFileSync(fileName);
-    //  //console.log("Entered")
+    const buffer = Buffer.from(fileName.replace(/^data:image\/\w+;base64,/, ''), 'base64');
 
-   
-      //  //console.log(FileType.fromFile('Unicorn.png'));
-        //=> {ext: 'png', mime: 'image/png'}
-   
-    
+    const mimeInfo = await fileType.fromBuffer(buffer)
 
-       const buffer = Buffer.from(fileName.replace(/^data:image\/\w+;base64,/, ''), 'base64');
 
-        const mimeInfo = await fileType.fromBuffer(buffer)
+    const { ext, mime } = mimeInfo;
+    var randomNumber = generator();
 
- 
-     const {ext,mime}=mimeInfo;
- var randomNumber=generator();
-      //  const imageExtension = path.extname(fileName);
-        // Setting up S3 upload parameters
-        const params = {
-            Bucket: BUCKET_NAME,
-            Key: userName+"_"+Date.now()+"_"+randomNumber+"."+ext,//+imageExtension, // File name you want to save as in S3
-            Body: buffer,
-            ACL:'public-read',
-            ContentEncoding: 'base64',
-            ContentType: mime
-              
-        };
+    const params = {
+      Bucket: BUCKET_NAME,
+      Key: userName + "_" + Date.now() + "_" + randomNumber + "." + ext,//+imageExtension, // File name you want to save as in S3
+      Body: buffer,
+      ACL: 'public-read',
+      ContentEncoding: 'base64',
+      ContentType: mime
 
-        // Uploading files to the bucket
-        s3.upload(params, function(err, data) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(data.Location);
-            }
-            //console.log(`File uploaded successfully. ${data.Location}`);
-        });
+    };
+
+    // Uploading files to the bucket
+    s3.upload(params, function (err, data) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data.Location);
+      }
+
     });
+  });
 };
-exports.removeFileFromS3 = function(filename, BUCKET_NAME, callback) {
+exports.removeFileFromS3 = function (filename, BUCKET_NAME, callback) {
 
   const filenamePlaceHolder = CONSTANT.PlaceholderImageUrl.split('/').slice(-1)[0];
-  if(filename.toString().trim()!==filenamePlaceHolder.toString().trim()){
-   
+  if (filename.toString().trim() !== filenamePlaceHolder.toString().trim()) {
+
     var params = {
       Bucket: BUCKET_NAME,
       Key: filename
     };
-    s3.deleteObject(params, function(err, data) {
+    s3.deleteObject(params, function (err, data) {
       if (err) {
         console.log(err);
         callback(err, null);
@@ -97,31 +82,31 @@ exports.removeFileFromS3 = function(filename, BUCKET_NAME, callback) {
     });
 
   }
-  }
+}
 
-  exports.removeMultipleFilesFromS3 = function(fileArr, BUCKET_NAME, callback) {
-    //Input format
-    var filenameObjects = [];
-    var fileName = "";
-    for(var i = 0; i < fileArr.length; i++){
-      fileName = fileArr[i].split("/")[3]+"/"+fileArr[i].split("/")[4];
-      if(fileName){
-        filenameObjects.push({Key : fileName});
-      }
+exports.removeMultipleFilesFromS3 = function (fileArr, BUCKET_NAME, callback) {
+  //Input format
+  var filenameObjects = [];
+  var fileName = "";
+  for (var i = 0; i < fileArr.length; i++) {
+    fileName = fileArr[i].split("/")[3] + "/" + fileArr[i].split("/")[4];
+    if (fileName) {
+      filenameObjects.push({ Key: fileName });
     }
-    var params = {
-      Bucket: "groupappproject",
-      Delete: {
-        Objects: filenameObjects
-      }
-    };
-    s3.deleteObjects(params, function(err, data) {
-      if (err) {
-        console.log(err);
-        callback(err, null);
-      } else {
-        console.log(data)
-        callback(null, true);
-      }
-    });
   }
+  var params = {
+    Bucket: "groupappproject",
+    Delete: {
+      Objects: filenameObjects
+    }
+  };
+  s3.deleteObjects(params, function (err, data) {
+    if (err) {
+      console.log(err);
+      callback(err, null);
+    } else {
+      console.log(data)
+      callback(null, true);
+    }
+  });
+}

@@ -149,20 +149,6 @@ router.get('/getAllPublicJoinedPostofGroup', auth, function (req, res) {
 
 });
 
-// router.post('/uploadMultipleImages/',auth,[upload.array('files')], function (req, res,next) {
-
-
-//   res.send("success")
-//   //  postObj.uploadMultipleImages(req, res);
-
-// });
-
-
-// router.post('/getAllPersonalPostofGroup', auth, function (req, res) {
-
-//     postObj.getAllPersonalPostofGroup(req, res);
-
-// });
 
 
 module.exports = router;

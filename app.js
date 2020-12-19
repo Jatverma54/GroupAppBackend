@@ -10,7 +10,7 @@ const adminRouter = require('./routes/admin');
 const groupRouter = require('./routes/groups');
 const groupPostRouter = require('./routes/posts');
 const notificationRouter = require('./routes/Notification');
-const bodyParser =require('body-parser');
+const bodyParser = require('body-parser');
 const connection = require('./common/connection');
 const app = express();
 
@@ -26,7 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //app.use(bodyParser.json());
 app.use(bodyParser.json({ limit: '200mb' }));
 //app.use(bodyParser.json({ 'type': '*/*',limit: '200mb' }));
-app.use(bodyParser.urlencoded({limit: '200mb', parameterLimit: 200000,extended: true}));
+app.use(bodyParser.urlencoded({ limit: '200mb', parameterLimit: 200000, extended: true }));
 app.use(express.json());
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -35,22 +35,19 @@ app.use('/groups', groupRouter);
 app.use('/groupPost', groupPostRouter);
 app.use('/notifications', notificationRouter);
 
-// app.use(bodyParser.json({limit: '200mb',extended: true}));
-// app.use(bodyParser.urlencoded({limit: '200mb', parameterLimit: 200000,extended: true}));
-
-app.get('/', function(req, res){
+app.get('/', function (req, res) {
   res.render('form');
 });
 
 
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

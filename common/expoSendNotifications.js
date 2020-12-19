@@ -8,7 +8,7 @@ const { parseTwoDigitYear } = require('moment');
 
 exports.sendNotification= async(notify) =>{
 
-//&& req.user._id.toString() !== notificationData[data].activity_by._id.toString()
+
     if (notify.notificationType === "all"&& notify.activity === "NewPostAdded") {
 
     
@@ -23,8 +23,8 @@ exports.sendNotification= async(notify) =>{
     else if (notify.notificationType === "Deleted from Group"){
     
       var groupData=await groupModel.findById(notify.group_id)
-      console.log(groupData,"groupDara")
-      console.log(notify.group_id,"notify groupDara")
+      // console.log(groupData,"groupDara")
+      // console.log(notify.group_id,"notify groupDara")
 
       sendNotificationtoUser([notify.SelectedUsersExpoTokens],"You have been removed from "+groupData.GroupName.toString()+" group by "+notify.activity_byName.toString())
   
@@ -39,19 +39,6 @@ exports.sendNotification= async(notify) =>{
         } 
     else if (notify.notificationType === "UserSpecific") {
 
-        // group_id: PostData.GroupId,
-        // activity_by: req.user._id,
-        // activity: "PostLikedBy",
-        // post_id: PostId,
-        // notificationType: "UserSpecific"
-
-        // group_id: PostData.GroupId,
-        // activity_by: req.user._id,
-        // activity: "CommentBy",
-        // post_id: req.body.postId,
-        // notificationType: "UserSpecific",
-        // comment_id:req.body.commentId
-       
         var PostData = await postModel.findById(notify.post_id);
         await PostData.populate({path:'OnwerId',select:['username','profile.full_name','profile.profile_pic']}).execPopulate();
         await PostData.populate('GroupId').execPopulate();
@@ -75,12 +62,6 @@ exports.sendNotification= async(notify) =>{
         }
     }
     else if (notify.notificationType === "UserSpecificComments") {
-      // group_id: PostData.GroupId,
-      // activity_by: req.user._id,
-      // activity: "CommentLike",
-      // post_id: req.body.postId,
-      // notificationType: "UserSpecificComments",
-      // comment_id:req.body.commentId
       var PostData = await postModel.findById(notify.post_id);
       await PostData.populate({path:'OnwerId',select:['username','profile.full_name','profile.profile_pic']}).execPopulate();
       await PostData.populate('GroupId').execPopulate();

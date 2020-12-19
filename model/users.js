@@ -134,12 +134,6 @@ UserModelSchema.virtual('posts', {
   })
   
 
-//   UserModelSchema.pre('remove', async function (next) {
-//     const user = this
-//     await postModel.deleteMany({ OnwerId: user._id })
-//     next()
-//   })
-
 UserModelSchema.plugin(uniqueValidator);
 
 const User = mongoose.model('UserModel', UserModelSchema)

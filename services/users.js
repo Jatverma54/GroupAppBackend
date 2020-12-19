@@ -10,19 +10,19 @@ const expoNotification = require('./../common/expoSendNotifications');
 
 exports.addUser = function (req, res, next) {
     try {
-        // uploadFile("C:/Users/snagdeote/Desktop/New folder/Groupapp_project/develop/images/promo-image.jpg", req.body.username)
+
         if (req.body.profile && req.body.profile.profilePic) {
             s3Config.uploadFile(req.body.profile.profilePic, req.body.username, CONSTANT.ProfilePictureBucketName)
                 .then(picLocation => saveUserInDB(req, res, picLocation))
                 .catch(function (e) {
-                    //console.log("Failed to upload profile pic", e);
+
                     res.status(400).send({ error: "Failed to upload profile pic" });
                 });
         } else {
             saveUserInDB(req, res, CONSTANT.PlaceholderImageUrl)
         }
     } catch (e) {
-        console.log(e,"ssssssssssss")
+        console.log(e, "ssssssssssss")
         res.status(500).send({ error: "Something went wrong" });
     }
 }
@@ -30,19 +30,19 @@ exports.addUser = function (req, res, next) {
 
 function saveUserInDB(req, res, picLocation) {
     req.body.profile.profile_pic = picLocation;
-    //console.log("****req.body",req.body);
+
     var UserData = new UserModel(req.body);
     UserData.save((err, result) => {
         if (err) {
-            //console.log("*****err", err);
-            if (err.errors&&err.errors.email !== undefined) {
+
+            if (err.errors && err.errors.email !== undefined) {
                 res.status(400).send({ error: "Email Id already exist" })
 
 
                 const filename = picLocation.split('/').slice(-1)[0];
-      
-                s3Config.removeFileFromS3(filename, CONSTANT.ProfilePictureBucketName, function(err, res){
-                    if(err){
+
+                s3Config.removeFileFromS3(filename, CONSTANT.ProfilePictureBucketName, function (err, res) {
+                    if (err) {
                         console.log("Unable to delete older image from S3.");
                     } else {
                         console.log("Removed older image from S3 successfully.");
@@ -50,13 +50,13 @@ function saveUserInDB(req, res, picLocation) {
                 });
 
             }
-            else if (err.errors&&err.errors.username !== undefined) {
+            else if (err.errors && err.errors.username !== undefined) {
                 res.status(400).send({ error: "Username already exist" });
-                
+
                 const filename = picLocation.split('/').slice(-1)[0];
-      
-                s3Config.removeFileFromS3(filename, CONSTANT.ProfilePictureBucketName, function(err, res){
-                    if(err){
+
+                s3Config.removeFileFromS3(filename, CONSTANT.ProfilePictureBucketName, function (err, res) {
+                    if (err) {
                         console.log("Unable to delete older image from S3.");
                     } else {
                         console.log("Removed older image from S3 successfully.");
@@ -64,7 +64,7 @@ function saveUserInDB(req, res, picLocation) {
                 });
             }
         } else {
-            //console.log("result", result);
+
 
             var params = {
                 userID: result._id,
@@ -72,30 +72,30 @@ function saveUserInDB(req, res, picLocation) {
             }
             sendEmail(params, async function (err, resp) {
                 if (err) {
-               
+
                     const deleteUser = await UserModel.remove({ _id: result._id });
-                    //console.log("mail error", err);
+
                     const filename = picLocation.split('/').slice(-1)[0];
-      
-                    s3Config.removeFileFromS3(filename, CONSTANT.ProfilePictureBucketName, function(err, res){
-                        if(err){
+
+                    s3Config.removeFileFromS3(filename, CONSTANT.ProfilePictureBucketName, function (err, res) {
+                        if (err) {
                             console.log("Unable to delete older image from S3.");
                         } else {
                             console.log("Removed older image from S3 successfully.");
                         }
                     });
-             
-                  
+
+
                     res.status(400).send({ error: "Unable to register. Internal error occured." });
                 } else {
-                    //console.log("mail success");
-                    res.status(201).send({ message: "Data saved successfully.", result:"" })
+
+                    res.status(201).send({ message: "Data saved successfully.", result: "" })
                 }
             });
 
 
         }
-        // saved!
+
     })
 }
 
@@ -123,7 +123,7 @@ exports.loginUser = async (req, res) => {
 
         const user = await UserModel.findByCredentials(req.body.username, req.body.password)
         const token = await user.generateAuthToken(req.body.ownerPushToken)
-      
+
         res.status(200).send({ user, token })
 
     } catch (err) {
@@ -171,7 +171,7 @@ exports.updateUserImage = async (req, res) => {
                 }, { $set: { "profile.profile_pic": picLocation } });
 
                 const filename = userVerified.profile.profile_pic.split('/').slice(-1)[0];
-                     
+
                 s3Config.removeFileFromS3(filename, CONSTANT.ProfilePictureBucketName, function (err, res) {
                     if (err) {
                         console.log("Unable to delete older image from S3.");
@@ -180,11 +180,11 @@ exports.updateUserImage = async (req, res) => {
                     }
                 });
 
-                var userData=await UserModel.findById(UserId,{username:1,'profile.full_name':1,'profile.profile_pic':1});
-        
-                res.status(200).send({result:userData});
-               
-               // console.log(userVerified);
+                var userData = await UserModel.findById(UserId, { username: 1, 'profile.full_name': 1, 'profile.profile_pic': 1 });
+
+                res.status(200).send({ result: userData });
+
+
             })
             .catch(function (e) {
                 console.log("Failed to upload profile pic", e);
@@ -192,7 +192,7 @@ exports.updateUserImage = async (req, res) => {
             });
 
     } catch (err) {
-        //console.log(err)
+
         res.status(500).send({ error: "Internal Server error" });
 
     }
@@ -204,61 +204,56 @@ exports.updateUserImage = async (req, res) => {
 
 exports.updateUserinformation = async (req, res) => {
     try {
-       var username= req.body.username;
-       var full_name= req.body.full_name;
-      
+        var username = req.body.username;
+        var full_name = req.body.full_name;
+
         var userVerified = await UserModel.update({
             _id: req.user._id,
-        }, { $set: { username, "profile.full_name":full_name } });
-      
-      var userData=await UserModel.findById(req.user._id,{username:1,'profile.full_name':1,'profile.profile_pic':1});
-        
-        res.status(200).send({result:userData});
- 
-        // //console.log("Failed to upload profile pic", e);   
+        }, { $set: { username, "profile.full_name": full_name } });
+
+        var userData = await UserModel.findById(req.user._id, { username: 1, 'profile.full_name': 1, 'profile.profile_pic': 1 });
+
+        res.status(200).send({ result: userData });
 
     } catch (err) {
-      //  console.log(err,"error")  
-         if (err.errmsg&&err.errmsg.includes(username)) {
+
+        if (err.errmsg && err.errmsg.includes(username)) {
             res.status(400).send({ error: "Username already exist" });
         }
         res.status(400).send({ error: "Something went wrong!! Please try again" });
-     
     }
 }
 
 
 
-exports.updateUserPassword =  (req, response) => {
+exports.updateUserPassword = (req, response) => {
     try {
 
-        bcrypt.compare(req.body.currentPassword, req.user.password, async function(err, res) {
-            if (err){
-                console.log(err," res error")  
-             return   response.status(400).send({ error: "Something went wrong!! Please try again" });
+        bcrypt.compare(req.body.currentPassword, req.user.password, async function (err, res) {
+            if (err) {
+                console.log(err, " res error")
+                return response.status(400).send({ error: "Something went wrong!! Please try again" });
             }
-            if (res){
-              
-                var password= req.body.password;
-          
+            if (res) {
+
+                var password = req.body.password;
+
                 var userVerified = await UserModel.update({
                     _id: req.user._id,
-                }, { $set: { password} });
+                }, { $set: { password } });
                 response.status(200).send("Password updated successfully");
-               
+
             } else {
-                
-              // response is OutgoingMessage object that server response http request
-              return response.status(400).send({success: false, message: 'Current Password do not match'});
+
+                // response is OutgoingMessage object that server response http request
+                return response.status(400).send({ success: false, message: 'Current Password do not match' });
             }
-          });
-      
-        // //console.log("Failed to upload profile pic", e);   
+        });
 
     } catch (err) {
-       console.log(err,"error")  
-      response.status(400).send({ error: "Something went wrong!! Please try again" });
-     
+        console.log(err, "error")
+        response.status(400).send({ error: "Something went wrong!! Please try again" });
+
     }
 }
 
@@ -267,37 +262,38 @@ exports.updateUserPassword =  (req, response) => {
 exports.userSearchQuery = async (req, res) => {
 
     try {
-  
+
         UserModel.aggregate(
             [
-                // Match first to reduce documents to those where the array contains the match
-                // { "$match": {
-                //     "username": { "$regex": req.body.userSearchQuery, "$options": "i" }
-                // }},
-                { "$match": {
-                    "username": { "$regex": req.body.userSearchQuery, "$options": "i" }
-                }},
 
-                
-             //   Group back as an array with only the matching elements
-                { "$group": {
-                    "_id": "$_id",
-                    "username": { "$first": "$username" },
-                    "name": { "$first": "$profile.full_name" },
-                    "image": { "$first": "$profile.profile_pic" },
-                }}
+                {
+                    "$match": {
+                        "username": { "$regex": req.body.userSearchQuery, "$options": "i" }
+                    }
+                },
+
+
+                //   Group back as an array with only the matching elements
+                {
+                    "$group": {
+                        "_id": "$_id",
+                        "username": { "$first": "$username" },
+                        "name": { "$first": "$profile.full_name" },
+                        "image": { "$first": "$profile.profile_pic" },
+                    }
+                }
             ],
-            function(err,results) {
-                if(err){
+            function (err, results) {
+                if (err) {
                     console.log(err)
                     res.status(400).json({ message: err });
-                }else{
-                   console.log(results)
+                } else {
+                   
                     res.status(200).json({ message: "Searched Users : ", result: results });
                 }
             }
         )
-        
+
     } catch (err) {
         console.log(err)
         res.status(400).json({ message: err });
@@ -310,41 +306,32 @@ exports.userSearchQuery = async (req, res) => {
 exports.adduserTogroup = async (req, res) => {
 
     try {
-        // const groupData = await groupModel.findById(req.body._id);
-var ExpoTokens=[];
-        for(var data in req.body.SelectedUsers){
-        const UserData = await UserModel.findById(req.body.SelectedUsers[data]._id);
-       
-      
-        if(!(UserData.joined_groups.find(a=>a.groupid.toString()===req.body.groupid))){
 
-            UserData.joined_groups = UserData.joined_groups.concat({ groupid: req.body.groupid})//name: result.GroupName,GroupCategoryid: req.body.GroupCategory_id 
-            await UserData.save()
-            ExpoTokens.push(UserData.ExpopushToken)
-        }
-    
+        var ExpoTokens = [];
+        for (var data in req.body.SelectedUsers) {
+            const UserData = await UserModel.findById(req.body.SelectedUsers[data]._id);
+            if (!(UserData.joined_groups.find(a => a.groupid.toString() === req.body.groupid))) {
+
+                UserData.joined_groups = UserData.joined_groups.concat({ groupid: req.body.groupid })//name: result.GroupName,GroupCategoryid: req.body.GroupCategory_id 
+                await UserData.save()
+                ExpoTokens.push(UserData.ExpopushToken)
+            }
+
         }
         res.status(200).json({ message: "Users added to group" });
 
+        if (ExpoTokens.length !== 0) {
 
-        if(ExpoTokens.length!==0){
-          
             var notify = {
- 
+
                 group_id: req.body.groupid,
                 activity_byName: req.user.profile.full_name,
                 notificationType: "Added to Group",
                 SelectedUsersExpoTokens: ExpoTokens
-                
+
             }
-           
-     
             expoNotification.sendNotification(notify)
-        
         }
-
-     
-
 
     } catch (err) {
         console.log(err)
@@ -376,38 +363,38 @@ function generator() {
 exports.AuthenticateEmail = async (req, res) => {
 
     try {
-        const UserData = await UserModel.findOne({email: req.body.Email});
-        
-        if(UserData){
+        const UserData = await UserModel.findOne({ email: req.body.Email });
 
-var resetCode=generator();
+        if (UserData) {
 
-UserData.resetCode=resetCode
+            var resetCode = generator();
 
-await UserData.save()
+            UserData.resetCode = resetCode
+
+            await UserData.save()
 
             var params = {
                 userID: UserData._id,
                 email: UserData.email,
                 FullName: UserData.profile.full_name,
-                Username:UserData.username,
-                resetCode:resetCode
+                Username: UserData.username,
+                resetCode: resetCode
             }
             sendConfirmationEmail(params, async function (err, resp) {
                 if (err) {
-                   
+
                     res.status(400).send({ error: "Unable to send confirmation code. Internal error occured." });
                 } else {
                     //console.log("mail success");
-                    res.status(200).json({ message: "Confirmation code sent",result: UserData._id});
+                    res.status(200).json({ message: "Confirmation code sent", result: UserData._id });
                 }
             });
-            
+
         }
-        else{
+        else {
             res.status(422).json({ message: "Email id does not exist" });
         }
-       
+
     } catch (err) {
         console.log(err)
         res.status(400).json({ message: err });
@@ -422,20 +409,20 @@ exports.AuthenticateConfirmationCode = async (req, res) => {
 
     try {
         const UserData = await UserModel.findById(req.body.Userid);
-      
-        if(UserData.resetCode===req.body.confrimationCode){
 
-            res.status(200).json({ message: "Confirmation code Verified",result: UserData._id});
+        if (UserData.resetCode === req.body.confrimationCode) {
 
-UserData.resetCode=""
+            res.status(200).json({ message: "Confirmation code Verified", result: UserData._id });
 
-await UserData.save()
+            UserData.resetCode = ""
 
-}
-        else{
+            await UserData.save()
+
+        }
+        else {
             res.status(422).json({ message: "Verification Failed" });
         }
-       
+
     } catch (err) {
         console.log(err)
         res.status(400).json({ message: err });
@@ -446,21 +433,19 @@ await UserData.save()
 
 
 
-exports.updateUserPasswordFromForget =async  (req, response) => {
+exports.updateUserPasswordFromForget = async (req, response) => {
     try {
-       
-                var password= req.body.password;
-          
-                var userVerified = await UserModel.update({
-                    _id: req.body.UserId,
-                }, { $set: { password} });
-                response.status(200).send("Password updated successfully");
-   
-        // //console.log("Failed to upload profile pic", e);   
+
+        var password = req.body.password;
+
+        var userVerified = await UserModel.update({
+            _id: req.body.UserId,
+        }, { $set: { password } });
+        response.status(200).send("Password updated successfully");
 
     } catch (err) {
-       console.log(err,"error")  
-      response.status(400).send({ error: "Something went wrong!! Please try again" });
-     
+        console.log(err, "error")
+        response.status(400).send({ error: "Something went wrong!! Please try again" });
+
     }
 }
