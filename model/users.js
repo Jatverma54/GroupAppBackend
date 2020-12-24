@@ -62,6 +62,7 @@ var UserModelSchema = new mongoose.Schema({
     resetCode:  {
         type: Number,
         },
+    EnableNotification:{ type: Boolean, default:true},
     isActive: { type: Boolean, required: true, default: false }
 },{timestamps:true});
 
@@ -71,7 +72,11 @@ UserModelSchema.methods.generateAuthToken = async function (ownerPushToken) {
 
     user.tokens = user.tokens.concat({ token })
 
-    user.ExpopushToken=ownerPushToken
+    
+    if(user.EnableNotification){
+        user.ExpopushToken=ownerPushToken
+    }
+  
     await user.save()
 
     return token

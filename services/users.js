@@ -150,8 +150,21 @@ exports.updateUser = async (req, res) => {
 
 exports.userInformation = async (req, res) => {
     try {
-
-        res.status(200).json({ message: "Data: ", result: req.user });
+          var userData= req.user.toObject();
+           delete userData.admin_id;
+           delete userData.isActive;
+           delete userData.password;
+           delete userData.created_groups;
+           delete userData.joined_groups;
+           delete userData.Requested_groups;
+           delete userData.tokens;
+           delete userData.createdAt;
+           delete userData.updatedAt;
+           delete userData.resetCode;
+           delete userData.EnableNotification;
+           
+           
+        res.status(200).json({ message: "Data: ", result: userData });
     } catch (err) {
         res.status(400).json({ message: err });
     }
@@ -442,6 +455,36 @@ exports.updateUserPasswordFromForget = async (req, response) => {
             _id: req.body.UserId,
         }, { $set: { password } });
         response.status(200).send("Password updated successfully");
+
+    } catch (err) {
+        console.log(err, "error")
+        response.status(400).send({ error: "Something went wrong!! Please try again" });
+
+    }
+}
+
+
+exports.turnOnOffNotification = async (req, response) => {
+    try {
+
+       
+       var userData= await UserModel.findById(req.user._id);
+
+       if(userData.ExpopushToken&&userData.ExpopushToken!==""&&req.body.notificationoff){
+
+        var userVerified = await UserModel.update({
+            _id: req.user._id,
+        }, { $set: { ExpopushToken: "",EnableNotification:false } });
+        response.status(200).send({message: "Notifications suspended"});
+
+       }else{
+        var userVerified = await UserModel.update({
+            _id: req.user._id,
+        }, { $set: { ExpopushToken: req.body.ownerPushToken,EnableNotification:true } });
+
+        response.status(200).send({message:"Notifications turned on"});
+       } 
+       
 
     } catch (err) {
         console.log(err, "error")

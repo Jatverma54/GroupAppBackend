@@ -127,5 +127,9 @@ router.post('/updateUserPasswordFromForget', function(req, res){
 });
 
 
+router.post('/turnOnOffNotification',auth, function(req, res){
+    //console.log("****User data");
+    userObj.turnOnOffNotification(req,res);
+});
 
 module.exports = router;
