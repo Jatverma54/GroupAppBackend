@@ -2,7 +2,9 @@
   "name": "groupappbackend",
   "version": "0.0.0",
   "private": true,
-
+  "scripts": {
+    "start": "nodemon app.js"
+  },
   "dependencies": {
     "@sendgrid/mail": "^7.2.5",
     "aws-sdk": "^2.755.0",
