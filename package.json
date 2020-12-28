@@ -1,7 +1,7 @@
 {
   "name": "groupappbackend",
-  "version": "3.0.0",
   "private": true,
+  "engines" : { "node" : ">=0.12" },
   "dependencies": {
     "@sendgrid/mail": "^7.2.5",
     "aws-sdk": "^2.755.0",
