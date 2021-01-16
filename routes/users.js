@@ -45,7 +45,7 @@ router.post('/logout', auth, async (req, res) => {
             return token.token !== req.token
         })
      
-      req.user.ExpopushToken=""
+     // req.user.ExpopushToken=""
         await req.user.save()
 
         res.status(200).send("Logout successfull")

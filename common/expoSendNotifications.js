@@ -40,7 +40,7 @@ exports.sendNotification= async(notify) =>{
     else if (notify.notificationType === "UserSpecific") {
 
         var PostData = await postModel.findById(notify.post_id);
-        await PostData.populate({path:'OnwerId',select:['username','profile.full_name','profile.profile_pic']}).execPopulate();
+        await PostData.populate({path:'OnwerId',select:['username','profile.full_name','profile.profile_pic','ExpopushToken']}).execPopulate();
         await PostData.populate('GroupId').execPopulate();
 
         if (PostData.OnwerId._id.toString() !== notify.activity_by.toString() ) {
@@ -49,7 +49,7 @@ exports.sendNotification= async(notify) =>{
         
         var activity_by = await UserModel.findById(notify.activity_by)
 
-        console.log(activity_by.profile.full_name)
+        console.log(activity_by)
           let Message=""
           if(notify.activity==='PostLikedBy'){
             Message= activity_by.profile.full_name.toString()+" liked your post: "+(!(PostData.postMetaData.length > 50) ?PostData.postMetaData:PostData.postMetaData.toString().substring(0,50)+"..")+ " from group "+ PostData.GroupId.GroupName.toString();
@@ -63,7 +63,7 @@ exports.sendNotification= async(notify) =>{
     }
     else if (notify.notificationType === "UserSpecificComments") {
       var PostData = await postModel.findById(notify.post_id);
-      await PostData.populate({path:'OnwerId',select:['username','profile.full_name','profile.profile_pic']}).execPopulate();
+      await PostData.populate({path:'OnwerId',select:['username','profile.full_name','profile.profile_pic','ExpopushToken']}).execPopulate();
       await PostData.populate('GroupId').execPopulate();
 
         let comments = PostData.Comments.find(a => a._id.toString() === notify.comment_id.toString());
@@ -102,6 +102,7 @@ exports.sendNotification= async(notify) =>{
                   Message= activity_by.profile.full_name.toString()+" liked your reply comment "+(!(ReplycommentsData.comment.length > 50) ?ReplycommentsData.comment:ReplycommentsData.comment.toString().substring(0,50)+"..");
                 }
                 var ExpoToken = await UserModel.findById(ReplycommentsData.OnwerId)
+              
                 sendNotificationtoUser([ExpoToken.ExpopushToken],Message)
              
             }
@@ -120,7 +121,7 @@ exports.sendNotification= async(notify) =>{
   function sendNotificationtoUser(somePushTokens,MessageData){
 
 if(somePushTokens.length!==0){
-let expo = new Expo({ accessToken: 'DtZTNN28E64ogPXSFU5O_xbqxv_Pj4C1gcyMhkKm' });
+let expo = new Expo({ accessToken: 'IXLnHaIeXBba8CU2wK-C6YmHlSRW87GewFxz0yEJ' });
 let messages = [];
 for (let pushToken in somePushTokens) {
   // Each push token looks like ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]
