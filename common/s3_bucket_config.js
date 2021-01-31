@@ -2,9 +2,9 @@ const fs = require('fs');
 const AWS = require('aws-sdk');
 const path = require('path');
 const fileType = require('file-type')
-const ID = 'AKIAJT524GEZ7PPA3GPQ';
-const SECRET = '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';
 const CONSTANT = require('./../common/constant');
+const ID = CONSTANT.S3ID;
+const SECRET = CONSTANT.S3SECRET;
 //const Buffer=require('buffer');
 // The name of the bucket that you have created
 //const BUCKET_NAME = 'groupappproject/ProfilePictures';
@@ -42,9 +42,10 @@ exports.uploadFile = (fileName, userName, BUCKET_NAME) => {
     const { ext, mime } = mimeInfo;
     var randomNumber = generator();
 
+    let filePath=userName + "_" + Date.now() + "_" + randomNumber + "." + ext;
     const params = {
       Bucket: BUCKET_NAME,
-      Key: userName + "_" + Date.now() + "_" + randomNumber + "." + ext,//+imageExtension, // File name you want to save as in S3
+      Key: filePath,//+imageExtension, // File name you want to save as in S3
       Body: buffer,
       ACL: 'public-read',
       ContentEncoding: 'base64',
@@ -57,7 +58,8 @@ exports.uploadFile = (fileName, userName, BUCKET_NAME) => {
       if (err) {
         reject(err);
       } else {
-        resolve(data.Location);
+        resolve(CONSTANT.CloudFrontURL+BUCKET_NAME.split('/')[1]+'/'+filePath);
+        //resolve(data.Location);
       }
 
     });

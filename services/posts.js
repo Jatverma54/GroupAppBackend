@@ -15,17 +15,17 @@ exports.addNewPost = async (req, res, next) => {
     try {
 
         if (req.body.content === "video") {
-            req.body.video = req.files[0].location;
+            req.body.video = req.files[0].location.replace(CONSTANT.BucketURL,CONSTANT.CloudFrontURL);
         }
         else if (req.body.content === "document") {
-            req.body.document = req.files[0].location;
+            req.body.document = req.files[0].location.replace(CONSTANT.BucketURL,CONSTANT.CloudFrontURL);
         }
         else if (req.body.content === "image") {
 
             var ImagesUrl = []
             var imagesobject = req.files;
             for (var data in imagesobject) {
-                ImagesUrl.push(imagesobject[data].location)
+                ImagesUrl.push(imagesobject[data].location.replace(CONSTANT.BucketURL,CONSTANT.CloudFrontURL))
 
                 req.body.image = ImagesUrl;
             }
@@ -379,6 +379,7 @@ exports.like = async (req, res) => {
 
 
         } else {
+            
             PostData.likedBy = PostData.likedBy.filter(a => a.toString() !== req.user._id.toString())
             PostData.save();
             res.status(200).send("Liked Array updated");

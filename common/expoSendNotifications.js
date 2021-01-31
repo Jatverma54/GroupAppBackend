@@ -136,7 +136,7 @@ for (let pushToken in somePushTokens) {
   messages.push({
     to: somePushTokens[pushToken],
     sound: 'default',
-    title:"GroupApp",
+    title:"GroupHelpMe",
     body: MessageData,
     data: {MessageData },
   })

@@ -4,13 +4,13 @@ aws = require('aws-sdk'), // ^2.2.41
 
 multer = require('multer'), // "multer": "^1.1.0"
 multerS3 = require('multer-s3'); //"^1.4.1"
-const ID = 'AKIAJT524GEZ7PPA3GPQ';
-const SECRET = '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';
+const ID = CONSTANT.S3ID;
+const SECRET = CONSTANT.S3SECRET;
 
 aws.config.update({
     secretAccessKey: SECRET,
     accessKeyId: ID,
-    region: 'us-east-1'
+    region: CONSTANT.region
 });
 
 var s3 = new aws.S3();

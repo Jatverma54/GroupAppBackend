@@ -323,6 +323,7 @@ exports.adduserTogroup = async (req, res) => {
         var ExpoTokens = [];
         for (var data in req.body.SelectedUsers) {
             const UserData = await UserModel.findById(req.body.SelectedUsers[data]._id);
+            
             if (!(UserData.joined_groups.find(a => a.groupid.toString() === req.body.groupid))) {
 
                 UserData.joined_groups = UserData.joined_groups.concat({ groupid: req.body.groupid })//name: result.GroupName,GroupCategoryid: req.body.GroupCategory_id 
