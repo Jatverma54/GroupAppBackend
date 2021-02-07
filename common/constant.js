@@ -12,7 +12,7 @@ var constants = {
  region: 'us-east-1',
   MailId: 'support@grouphelpme.com',
   Mailpass: 'Awesome@2394',
-  EndpointUrl:'http://localhost:3000'
+  EndpointUrl:'http://GroupAppbackend-dev.ap-south-1.elasticbeanstalk.com'
 }
 
 module.exports = constants;
