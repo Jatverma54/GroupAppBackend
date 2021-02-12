@@ -19,7 +19,7 @@ function sendEmail(params, callback){
       from: CONSTANT.ADMIN_EMAIL,
       to: params.email,
       subject: 'GroupHelpMe App: Reset your password',
-      html: `<h1>Hi ${params.FullName}</h1><p>Please use this code in the app to reset your password</p><h2>${params.resetCode}</h2><p>Best Regards,</p><p>GroupHelpMe Team</p>`
+      html: `<h1>Hi ${params.FullName}</h1><p>Please use this code in the app to reset your password</p><h2>${params.resetCode}</h2><p>Best Regards,</p><p>GroupHelpMe Team</p><p>www.grouphelpme.com</p>`
   };   
   transporter.sendMail(mailOptions, function(error, info){
       if (error) {
