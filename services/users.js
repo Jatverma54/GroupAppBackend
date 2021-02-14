@@ -22,7 +22,7 @@ exports.addUser = function (req, res, next) {
             saveUserInDB(req, res, CONSTANT.PlaceholderImageUrl)
         }
     } catch (e) {
-        console.log(e, "ssssssssssss")
+      
         res.status(500).send({ error: "Something went wrong" });
     }
 }
@@ -43,9 +43,9 @@ function saveUserInDB(req, res, picLocation) {
 
                 s3Config.removeFileFromS3(filename, CONSTANT.ProfilePictureBucketName, function (err, res) {
                     if (err) {
-                        console.log("Unable to delete older image from S3.");
+                     
                     } else {
-                        console.log("Removed older image from S3 successfully.");
+                     
                     }
                 });
 
@@ -57,9 +57,9 @@ function saveUserInDB(req, res, picLocation) {
 
                 s3Config.removeFileFromS3(filename, CONSTANT.ProfilePictureBucketName, function (err, res) {
                     if (err) {
-                        console.log("Unable to delete older image from S3.");
+                     
                     } else {
-                        console.log("Removed older image from S3 successfully.");
+                      
                     }
                 });
             }
@@ -79,9 +79,9 @@ function saveUserInDB(req, res, picLocation) {
 
                     s3Config.removeFileFromS3(filename, CONSTANT.ProfilePictureBucketName, function (err, res) {
                         if (err) {
-                            console.log("Unable to delete older image from S3.");
+                        
                         } else {
-                            console.log("Removed older image from S3 successfully.");
+                           
                         }
                     });
 
@@ -140,7 +140,7 @@ exports.updateUser = async (req, res) => {
         }, { $set: { isActive: true } });
         res.send("User verified successfully");
     } catch (err) {
-        //console.log(err)
+        //
         res.status(400).send({ message: err });
 
     }
@@ -187,9 +187,9 @@ exports.updateUserImage = async (req, res) => {
 
                 s3Config.removeFileFromS3(filename, CONSTANT.ProfilePictureBucketName, function (err, res) {
                     if (err) {
-                        console.log("Unable to delete older image from S3.");
+                     
                     } else {
-                        console.log("Removed older image from S3 successfully.");
+                     
                     }
                 });
 
@@ -200,7 +200,7 @@ exports.updateUserImage = async (req, res) => {
 
             })
             .catch(function (e) {
-                console.log("Failed to upload profile pic", e);
+            
                 res.status(400).send({ error: "Failed to upload profile pic" });
             });
 
@@ -244,7 +244,7 @@ exports.updateUserPassword = (req, response) => {
 
         bcrypt.compare(req.body.currentPassword, req.user.password, async function (err, res) {
             if (err) {
-                console.log(err, " res error")
+            
                 return response.status(400).send({ error: "Something went wrong!! Please try again" });
             }
             if (res) {
@@ -264,7 +264,7 @@ exports.updateUserPassword = (req, response) => {
         });
 
     } catch (err) {
-        console.log(err, "error")
+     
         response.status(400).send({ error: "Something went wrong!! Please try again" });
 
     }
@@ -298,7 +298,7 @@ exports.userSearchQuery = async (req, res) => {
             ],
             function (err, results) {
                 if (err) {
-                    console.log(err)
+                    
                     res.status(400).json({ message: err });
                 } else {
                    
@@ -308,7 +308,7 @@ exports.userSearchQuery = async (req, res) => {
         )
 
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ message: err });
     }
 }
@@ -348,7 +348,7 @@ exports.adduserTogroup = async (req, res) => {
         }
 
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ message: err });
     }
 
@@ -399,7 +399,7 @@ exports.AuthenticateEmail = async (req, res) => {
 
                     res.status(400).send({ error: "Unable to send confirmation code. Internal error occured." });
                 } else {
-                    //console.log("mail success");
+                  
                     res.status(200).json({ message: "Confirmation code sent", result: UserData._id });
                 }
             });
@@ -410,7 +410,7 @@ exports.AuthenticateEmail = async (req, res) => {
         }
 
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ message: err });
     }
 
@@ -438,7 +438,7 @@ exports.AuthenticateConfirmationCode = async (req, res) => {
         }
 
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ message: err });
     }
 
@@ -458,7 +458,6 @@ exports.updateUserPasswordFromForget = async (req, response) => {
         response.status(200).send("Password updated successfully");
 
     } catch (err) {
-        console.log(err, "error")
         response.status(400).send({ error: "Something went wrong!! Please try again" });
 
     }
@@ -488,7 +487,6 @@ exports.turnOnOffNotification = async (req, response) => {
        
 
     } catch (err) {
-        console.log(err, "error")
         response.status(400).send({ error: "Something went wrong!! Please try again" });
 
     }

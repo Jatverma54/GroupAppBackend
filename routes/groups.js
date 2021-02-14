@@ -9,8 +9,6 @@ const CONSTANT = require('../common/constant');
 
 router.post('/createNewGroup', auth,function(req, res){
 
-   
-    //console.log("****req.body of createNewGroup", req.body);
     groupsObj.addNewGroup(req, res);
   
 });
@@ -28,31 +26,31 @@ router.post('/getPublicGroupsWithCategory', auth,function(req, res){
 });
 
 router.delete('/:id', auth,function(req, res){
-    //console.log("****req.body.password", req.body.password);
+
     groupsObj.deleteData(req,res);
 });
 
 
 router.post('/ViewGroupMembers', auth,function(req, res){
-    //console.log("****req.body.password", req.body);
+ 
     groupsObj.viewGroupMembers(req,res);
 });
 
 
 router.post('/SendJoinRequest', auth,function(req, res){
-    //console.log("****req.body.password", req.body);
+  
     groupsObj.SendJoinRequest(req,res);
 });
 
 
 router.post('/DeleteSentJoinRequest', auth,function(req, res){
-    //console.log("****req.body.password", req.body);
+   
     groupsObj.DeleteSentJoinRequest(req,res);
 });
 
 
 router.get('/getJoinedPublicGroups', auth,function(req, res){
-    //console.log("****req.body.password", req.body);
+    
     groupsObj.getJoinedPublicGroups(req,res);
 });
 
@@ -105,26 +103,26 @@ router.post('/removeGroupRequest', auth,function(req, res){
 
 
 router.post('/leaveGroup', auth,function(req, res){
-    //console.log("****req.body.password", req.body.password);
+    
     groupsObj.leaveGroup(req,res);
 });
 
 
 router.get('/getJoinedPrivateGroups', auth,function(req, res){
-    //console.log("****req.body.password", req.body.password);
+   
     groupsObj.getJoinedPrivateGroups(req,res);
 });
 
 
 router.post('/groupSearchQuery', auth,function(req, res){
-    //console.log("****req.body.password", req.body.password);
+   
     groupsObj.groupSearchQuery(req,res);
 });
 
 
 
 router.get('/getPublicGroupListScreen/:id', auth,function(req, res){
-    //console.log("****req.body.password", req.body.password);
+  
     groupsObj.getPublicGroupListScreen(req,res);
 });
 

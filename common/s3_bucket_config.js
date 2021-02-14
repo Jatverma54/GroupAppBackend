@@ -76,7 +76,7 @@ exports.removeFileFromS3 = function (filename, BUCKET_NAME, callback) {
     };
     s3.deleteObject(params, function (err, data) {
       if (err) {
-        console.log(err);
+        ;
         callback(err, null);
       } else {
         callback(null, true);
@@ -104,10 +104,10 @@ exports.removeMultipleFilesFromS3 = function (fileArr, BUCKET_NAME, callback) {
   };
   s3.deleteObjects(params, function (err, data) {
     if (err) {
-      console.log(err);
+      ;
       callback(err, null);
     } else {
-      console.log(data)
+     
       callback(null, true);
     }
   });

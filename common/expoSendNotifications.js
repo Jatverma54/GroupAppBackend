@@ -23,9 +23,7 @@ exports.sendNotification= async(notify) =>{
     else if (notify.notificationType === "Deleted from Group"){
     
       var groupData=await groupModel.findById(notify.group_id)
-      // console.log(groupData,"groupDara")
-      // console.log(notify.group_id,"notify groupDara")
-
+     
       sendNotificationtoUser([notify.SelectedUsersExpoTokens],"You have been removed from "+groupData.GroupName.toString()+" group by "+notify.activity_byName.toString())
   
       } 
@@ -49,7 +47,6 @@ exports.sendNotification= async(notify) =>{
         
         var activity_by = await UserModel.findById(notify.activity_by)
 
-        console.log(activity_by)
           let Message=""
           if(notify.activity==='PostLikedBy'){
             Message= activity_by.profile.full_name.toString()+" liked your post: "+(!(PostData.postMetaData.length > 50) ?PostData.postMetaData:PostData.postMetaData.toString().substring(0,50)+"..")+ " from group "+ PostData.GroupId.GroupName.toString();
@@ -73,7 +70,6 @@ exports.sendNotification= async(notify) =>{
           
           var activity_by = await UserModel.findById(notify.activity_by)
 
-          console.log(activity_by.profile.full_name)
             let Message=""
             if(notify.activity==='CommentLike'){
               Message= activity_by.profile.full_name.toString()+" liked your comment "+(!(comments.comment.length > 50) ?comments.comment:comments.comment.toString().substring(0,50)+"..")+" on Post: "+(!(PostData.postMetaData.length > 50) ?PostData.postMetaData:PostData.postMetaData.toString().substring(0,50)+"..")+ " from group "+ PostData.GroupId.GroupName.toString();
@@ -96,7 +92,6 @@ exports.sendNotification= async(notify) =>{
             
               var activity_by = await UserModel.findById(notify.activity_by)
 
-              console.log(activity_by.profile.full_name)
                 let Message=""
                 if(notify.activity==='RepliedOnCommentLike'){
                   Message= activity_by.profile.full_name.toString()+" liked your reply comment "+(!(ReplycommentsData.comment.length > 50) ?ReplycommentsData.comment:ReplycommentsData.comment.toString().substring(0,50)+"..");
@@ -152,7 +147,7 @@ let tickets = [];
 for (let chunk of chunks) {
 try {
   let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-  console.log(ticketChunk);
+ 
   tickets.push(...ticketChunk);
   // NOTE: If a ticket contains an error code in ticket.details.error, you
   // must handle it appropriately. The error codes are listed in the Expo
@@ -183,7 +178,7 @@ let receiptIdChunks = expo.chunkPushNotificationReceiptIds(receiptIds);
 for (let chunk of receiptIdChunks) {
 try {
   let receipts = await expo.getPushNotificationReceiptsAsync(chunk);
-  console.log(receipts);
+ 
 
   // The receipts specify whether Apple or Google successfully received the
   // notification and information about an error, if one occurred.

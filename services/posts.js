@@ -34,7 +34,7 @@ exports.addNewPost = async (req, res, next) => {
 
         savePostInDB(req, res)
     } catch (err) {
-        console.log(err)
+        
         res.status(500).send({ error: "Category is not present in DB" });
     }
 }
@@ -51,8 +51,7 @@ function savePostInDB(req, res,) {
 
             if (err) {
 
-                console.log("*****err", err);
-
+                
                 res.status(400).send({ error: "Something went wrong" })
 
 
@@ -76,8 +75,7 @@ function savePostInDB(req, res,) {
         })
 
     } catch (err) {
-        console.log("*****err", err);
-        res.status(500).send({ error: "Category is not present in DB" });
+                res.status(500).send({ error: "Category is not present in DB" });
     }
 }
 
@@ -135,7 +133,7 @@ exports.getAllPostofGroupFromNotification = async (req, res) => {
 
         res.status(200).json({ message: "User as Admin: ", result: postdataObjectArray });
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ message: err });
     }
 
@@ -190,7 +188,7 @@ exports.getAllPostofGroup = async (req, res) => {
 
         res.status(200).json({ message: "User as Admin: ", result: postdataObjectArray });
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ message: err });
     }
 
@@ -246,7 +244,7 @@ exports.getAllUserPostofGroup = async (req, res) => {
 
         res.status(200).json({ message: "User as Admin: ", result: postdataObjectArray });
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ message: err });
     }
 
@@ -262,7 +260,7 @@ exports.deleteData = async (req, res) => {
             var fileArr = postData.image;
             s3BucketConfig.removeMultipleFilesFromS3(fileArr, CONSTANT.PostMediaBucketName, function (err, data) {
                 if (err) {
-                    console.log(err);
+                    ;
                 }
             });
         } else {
@@ -274,14 +272,14 @@ exports.deleteData = async (req, res) => {
             if (fileName) {
                 s3BucketConfig.removeFileFromS3(fileName, CONSTANT.PostMediaBucketName, function (err, res) {
                     if (err) {
-                        console.log(err);
+                        ;
                     }
                 });
             }
         }
         const RemoveNotification = await NotificationModel.deleteMany({ post_id: req.params.id });
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ message: err });
     }
 }
@@ -314,7 +312,7 @@ exports.deleteDataAndUserfromGroup = async (req, res) => {
             var fileArr = postData.image;
             s3BucketConfig.removeMultipleFilesFromS3(fileArr, CONSTANT.PostMediaBucketName, function (err, data) {
                 if (err) {
-                    console.log(err);
+                    ;
                 }
             });
         } else {
@@ -326,7 +324,7 @@ exports.deleteDataAndUserfromGroup = async (req, res) => {
             if (fileName) {
                 s3BucketConfig.removeFileFromS3(fileName, CONSTANT.PostMediaBucketName, function (err, res) {
                     if (err) {
-                        console.log(err);
+                        ;
                     }
                 });
             }
@@ -345,7 +343,7 @@ exports.deleteDataAndUserfromGroup = async (req, res) => {
 
         expoNotification.sendNotification(notify)
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ message: err });
     }
 }
@@ -420,7 +418,7 @@ exports.viewlikes = async (req, res) => {
         res.status(200).send({ result: LikedUser });
 
     } catch (err) {
-        console.log(err)
+        
         res.status(500).send({ error: "Something went wrong" });
 
     }
@@ -458,8 +456,7 @@ exports.addNewComment = async (req, res) => {
 
         expoNotification.sendNotification(notify)
     } catch (err) {
-        console.log("*****err", err);
-        res.status(500).send({ error: "Comments are not getting updated" });
+                res.status(500).send({ error: "Comments are not getting updated" });
     }
 }
 
@@ -507,8 +504,7 @@ exports.getComments = async (req, res) => {
         res.status(200).send({ result: Response });
 
     } catch (err) {
-        console.log("*****err", err);
-        res.status(500).send({ error: "Not able to fetch comments" });
+                res.status(500).send({ error: "Not able to fetch comments" });
     }
 }
 
@@ -549,7 +545,7 @@ exports.Commentslike = async (req, res) => {
         }
 
     } catch (err) {
-        console.log(err)
+        
         res.status(500).send({ error: "Something went wrong" });
 
     }
@@ -559,7 +555,7 @@ exports.Commentslike = async (req, res) => {
 
 exports.viewCommentlikes = async (req, res) => {
     try {
-        console.log(req.body.postId)
+    
         var PostId = req.body.postId;
         var PostData = await postModel.findById(PostId);
 
@@ -582,7 +578,7 @@ exports.viewCommentlikes = async (req, res) => {
         res.status(200).send({ result: LikedUser });
 
     } catch (err) {
-        console.log(err)
+        
         res.status(500).send({ error: "Something went wrong" });
 
     }
@@ -604,7 +600,7 @@ exports.deleteComment = async (req, res) => {
         res.status(200).send({ result: "" });
 
     } catch (err) {
-        console.log(err)
+        
         res.status(500).send({ error: "Something went wrong" });
 
     }
@@ -655,8 +651,7 @@ exports.getReplyComments = async (req, res) => {
         res.status(200).send({ result: Response });
 
     } catch (err) {
-        console.log("*****err", err);
-        res.status(500).send({ error: "Not able to fetch comments" });
+                res.status(500).send({ error: "Not able to fetch comments" });
     }
 }
 
@@ -694,8 +689,7 @@ exports.addNewReplyComment = async (req, res) => {
 
         expoNotification.sendNotification(notify)
     } catch (err) {
-        console.log("*****err", err);
-        res.status(500).send({ error: "Comments are not getting updated" });
+                res.status(500).send({ error: "Comments are not getting updated" });
     }
 }
 
@@ -739,7 +733,7 @@ exports.replyCommentslike = async (req, res) => {
 
 
     } catch (err) {
-        console.log(err)
+        
         res.status(500).send({ error: "Something went wrong" });
 
     }
@@ -773,7 +767,7 @@ exports.viewReplyCommentlikes = async (req, res) => {
         res.status(200).send({ result: LikedUser });
 
     } catch (err) {
-        console.log(err)
+        
         res.status(500).send({ error: "Something went wrong" });
 
     }
@@ -799,7 +793,7 @@ exports.deleteReplyComment = async (req, res) => {
         res.status(200).send({ result: PostData });
 
     } catch (err) {
-        console.log(err)
+        
         res.status(500).send({ error: "Something went wrong" });
 
     }
@@ -881,7 +875,7 @@ exports.getAllPublicJoinedPostofGroup = async (req, res) => {
 
         res.status(200).json({ message: "User as Admin: ", result: arr });
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ message: err });
     }
 

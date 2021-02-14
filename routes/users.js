@@ -7,22 +7,19 @@ const CONSTANT = require('./../common/constant');
 
 /* GET users listing. */
 router.post('/', function(req, res){
-    //console.log("****req.body.password", req.body.password);
+  
     bcrypt.hash(req.body.password, CONSTANT.BCRYPT_SALT, (err, encrypted) => {
-        //console.log("****req.body.password", req.body.password);
-        //console.log("****encrypted", encrypted);
         req.body.password = encrypted
         userObj.addUser(req, res);
     });
 });
 
 router.get('/',auth, function(req, res){
-    //console.log("****User data");
+
     userObj.getData(req,res);
 });
 
 router.delete('/:id', function(req, res){
-    //console.log("****req.body.password", req.body.password);
     
 });
 
@@ -61,29 +58,27 @@ router.get('/verify/:id', function(req, res){
 
 
 router.get('/userInformation',auth, function(req, res){
-    //console.log("****User data");
+    
     userObj.userInformation(req,res);
 });
 
 
 router.post('/updateUserImage',auth, function(req, res){
-    //console.log("****User data");
+   
     userObj.updateUserImage(req,res);
 });
 
 
 router.post('/updateUserinformation',auth, function(req, res){
-    //console.log("****User data");
+    
     userObj.updateUserinformation(req,res);
 });
 
 
 router.post('/updateUserPassword',auth, function(req, res){
-    //console.log("****req.body.password", req.body.password);
+  
 
     bcrypt.hash(req.body.password, CONSTANT.BCRYPT_SALT, (err, encrypted) => {
-        //console.log("****req.body.password", req.body.password);
-        //console.log("****encrypted", encrypted);
         req.body.password = encrypted
         userObj.updateUserPassword(req, res);
     });
@@ -92,35 +87,34 @@ router.post('/updateUserPassword',auth, function(req, res){
 
 
 router.post('/userSearchQuery',auth, function(req, res){
-    //console.log("****User data");
+    
     userObj.userSearchQuery(req,res);
 });
 
 
 router.post('/adduserTogroup',auth, function(req, res){
-    //console.log("****User data");
+    
     userObj.adduserTogroup(req,res);
 });
 
 
 router.post('/ForgetPassword/AuthenticateEmail', function(req, res){
-    //console.log("****User data");
+    
     userObj.AuthenticateEmail(req,res);
 });
 
 router.post('/ForgetPassword/AuthenticateConfirmationCode', function(req, res){
-    //console.log("****User data");
+    
     userObj.AuthenticateConfirmationCode(req,res);
 });
 
 
 
 router.post('/updateUserPasswordFromForget', function(req, res){
-    //console.log("****req.body.password", req.body.password);
+  
 
     bcrypt.hash(req.body.password, CONSTANT.BCRYPT_SALT, (err, encrypted) => {
-        //console.log("****req.body.password", req.body.password);
-        //console.log("****encrypted", encrypted);
+      
         req.body.password = encrypted
         userObj.updateUserPasswordFromForget(req, res);
     });
@@ -128,7 +122,7 @@ router.post('/updateUserPasswordFromForget', function(req, res){
 
 
 router.post('/turnOnOffNotification',auth, function(req, res){
-    //console.log("****User data");
+    
     userObj.turnOnOffNotification(req,res);
 });
 

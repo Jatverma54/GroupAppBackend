@@ -45,12 +45,12 @@ router.post('/getAllUserPostofGroup/:id', auth, function (req, res) {
 });
 
 router.delete('/:id', auth, function (req, res) {
-    //console.log("****req.body.password", req.body.password);
+   
     postObj.deleteData(req, res);
 });
 
 router.post('/deleteDataAndUserfromGroup', auth, function (req, res) {
-    //console.log("****req.body.password", req.body.password);
+  
     postObj.deleteDataAndUserfromGroup(req, res);
 });
 

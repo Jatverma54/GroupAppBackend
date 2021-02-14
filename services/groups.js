@@ -56,7 +56,7 @@ function savegroupInDB(req, res, picLocation) {
                     res.status(400).send({ error: "Group Name already exist" })
                 }
                 else {
-                    console.log(err)
+                    
                     res.status(400).send({ error: "Something went wrong" })
                 }
 
@@ -119,7 +119,7 @@ exports.getPublicGroupsWithCategory = async (req, res) => {
 
         res.status(200).json({ message: "Data: ", result: groupData });
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ error: err });
     }
 }
@@ -140,9 +140,9 @@ exports.deleteData = async (req, res) => {
 
             s3Config.removeFileFromS3(filename, CONSTANT.GroupProfilePictureBucketName, function (err, res) {
                 if (err) {
-                    console.log("Unable to delete older image from S3.");
+                  
                 } else {
-                    console.log("Removed older image from S3 successfully.");
+                  
                 }
             });
 
@@ -173,7 +173,7 @@ exports.deleteData = async (req, res) => {
                     var fileArr = postData[data].image;
                     s3BucketConfig.removeMultipleFilesFromS3(fileArr, CONSTANT.PostMediaBucketName, function (err, data) {
                         if (err) {
-                            console.log(err);
+                            ;
                         }
                     });
                 } else {
@@ -185,7 +185,7 @@ exports.deleteData = async (req, res) => {
                     if (fileName) {
                         s3BucketConfig.removeFileFromS3(fileName, CONSTANT.PostMediaBucketName, function (err, res) {
                             if (err) {
-                                console.log(err);
+                                ;
                             }
                         });
                     }
@@ -199,7 +199,7 @@ exports.deleteData = async (req, res) => {
         }
 
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ message: err });
     }
 }
@@ -226,7 +226,7 @@ exports.viewGroupMembers = async (req, res) => {
 
         res.status(200).json({ message: "Group Members: ", result: filteredArray });
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ message: err });
     }
 }
@@ -375,7 +375,7 @@ exports.getJoinedPublicGroups = async (req, res) => {
         res.status(200).json({ message: "Joined Groups : ", result: Response });
 
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ message: err });
     }
 }
@@ -396,21 +396,20 @@ exports.updateGroupImage = async (req, res) => {
 
                 s3Config.removeFileFromS3(filename, CONSTANT.GroupProfilePictureBucketName, function (err, res) {
                     if (err) {
-                        console.log("Unable to delete older image from S3.");
+                     
                     } else {
-                        console.log("Removed older image from S3 successfully.");
+                      
                     }
                 });
                 res.status(200).send("Image Uploaded successfully");
-                console.log(userVerified);
+              
             })
             .catch(function (e) {
-                console.log("Failed to upload profile pic", e);
                 res.status(400).send({ error: "Failed to upload profile pic" });
             });
 
     } catch (err) {
-        //console.log(err)
+        //
         res.status(500).send({ error: "Internal Server error" });
 
     }
@@ -500,7 +499,7 @@ exports.AdmindeleteUserfromtheGroup = async (req, res) => {
 
 
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ message: err });
     }
 
@@ -520,7 +519,7 @@ exports.DismissUserAsAdmin = async (req, res) => {
 
         res.status(200).json({ message: "Dismiss User As Admin: ", result: groupdata });
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ message: err });
     }
 
@@ -530,7 +529,7 @@ exports.DismissUserAsAdmin = async (req, res) => {
 
 exports.MakeUserAsAdmin = async (req, res) => {
     try {
-        console.log(req.body.groupid)
+      
         const groupdata = await groupModel.findOne({ _id: req.body.groupid });
 
         groupdata.admin_id.push(req.body.userId)
@@ -549,7 +548,7 @@ exports.MakeUserAsAdmin = async (req, res) => {
 
         expoNotification.sendNotification(notify)
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ message: err });
     }
 
@@ -568,7 +567,7 @@ exports.getAllGroupRequest = async (req, res) => {
 
         res.status(200).json({ message: "Users Requested: ", result: UserData });
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ message: err });
     }
 }
@@ -593,7 +592,7 @@ exports.confirmGroupRequest = async (req, res) => {
 
         res.status(200).json({ message: "Users Confirmed: ", result: "" });
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ message: err });
     }
 }
@@ -642,7 +641,7 @@ exports.leaveGroup = async (req, res) => {
 
         res.status(200).json({ message: "Removed User from group: ", result: "" });
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ message: err });
     }
 }
@@ -674,7 +673,7 @@ exports.getJoinedPrivateGroups = async (req, res) => {
         res.status(200).json({ message: "Joined Groups : ", result: response });
 
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ message: err });
     }
 }
@@ -707,7 +706,7 @@ exports.groupSearchQuery = async (req, res) => {
             ],
             async function (err, results) {
                 if (err) {
-                    console.log(err)
+                    
                     res.status(400).json({ message: err });
                 } else {
 
@@ -735,7 +734,7 @@ exports.groupSearchQuery = async (req, res) => {
         )
 
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ message: err });
     }
 }
@@ -757,7 +756,7 @@ exports.getPublicGroupListScreen = async (req, res) => {
 
         res.status(200).json({ message: "Data: ", result: [groupObject] });
     } catch (err) {
-        console.log(err)
+        
         res.status(400).json({ error: err });
     }
 }

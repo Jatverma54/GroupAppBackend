@@ -67,7 +67,7 @@ exports.getNotification = async (req, res, next) => {
         res.status(200).send({ message: "Notifications", result: ToBeInserted })
 
     } catch (err) {
-        console.log(err)
+        
         res.status(500).send({ error: "Category is not present in DB" });
     }
 }
@@ -135,7 +135,7 @@ exports.getAllNotification = async (req, res, next) => {
         res.status(200).send({ message: "Notifications", result: ToBeInserted })
    
     } catch (err) {
-        console.log(err)
+        
         res.status(500).send({ error: "Category is not present in DB" });
     }
 }
