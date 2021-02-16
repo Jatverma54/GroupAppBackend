@@ -373,8 +373,9 @@ exports.like = async (req, res) => {
             var notificationData = new NotificationModel(notify);
             notificationData.save();
 
+            if(PostData.likedBy.length<10){
             expoNotification.sendNotification(notify)
-
+            }
 
         } else {
             
@@ -454,7 +455,10 @@ exports.addNewComment = async (req, res) => {
         var notificationData = new NotificationModel(notify);
         notificationData.save();
 
-        expoNotification.sendNotification(notify)
+        if(PostData.Comments.length<10){
+            expoNotification.sendNotification(notify)
+            }
+      
     } catch (err) {
                 res.status(500).send({ error: "Comments are not getting updated" });
     }
@@ -534,8 +538,9 @@ exports.Commentslike = async (req, res) => {
             }
             var notificationData = new NotificationModel(notify);
             notificationData.save();
-
+            if(commentsData.LikedBy.length<10){
             expoNotification.sendNotification(notify)
+            }
         } else {
             commentsData.LikedBy = commentsData.LikedBy.filter(a => a.toString() !== req.user._id.toString())
             PostData.save();
