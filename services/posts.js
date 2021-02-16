@@ -689,10 +689,10 @@ exports.addNewReplyComment = async (req, res) => {
         var notificationData = new NotificationModel(notify);
         notificationData.save();
 
-
-
-
-        expoNotification.sendNotification(notify)
+        if(commentData.ReplyComment.length<10){
+            expoNotification.sendNotification(notify)
+        }
+      
     } catch (err) {
                 res.status(500).send({ error: "Comments are not getting updated" });
     }
@@ -728,7 +728,10 @@ exports.replyCommentslike = async (req, res) => {
             var notificationData = new NotificationModel(notify);
             notificationData.save();
 
-            expoNotification.sendNotification(notify)
+            if( ReplycommentsData.LikedBy.length<10){
+                expoNotification.sendNotification(notify)
+            }
+         
 
         } else {
             ReplycommentsData.LikedBy = ReplycommentsData.LikedBy.filter(a => a.toString() !== req.user._id.toString())
