@@ -34,10 +34,6 @@ exports.getCategories = async (req, res) => {
     try {
 
         const CategoryData = await CategoryModel.find();
-
-        for (var data in CategoryData) {
-            CategoryData[data].Groups = await groupModel.countDocuments({ GroupCategory_id: CategoryData[data]._id })
-        }
         res.status(200).json({ message: "Data: ", result: CategoryData });
     } catch (err) {
         res.status(400).json({ error: err });
