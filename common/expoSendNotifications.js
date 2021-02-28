@@ -10,8 +10,18 @@ exports.sendNotification= async(notify) =>{
 
 
     if (notify.notificationType === "all"&& notify.activity === "NewPostAdded") {
-
+      
+      var filteredArray = await UserModel.find({ "joined_groups.groupid": notify.group_id }, { username: 1, 'profile.full_name': 1, ExpopushToken: 1 });
     
+      for(var data in filteredArray){
+
+        if (filteredArray[data]._id.toString() !== notify.activity_by.toString() ) { 
+        sendNotificationtoUser([filteredArray[data].ExpopushToken],notify.activity_byName.toString()+" added a new post in "+notify.GroupName.toString()+" group")
+        }
+      }
+     
+    
+         
     } 
     else if (notify.notificationType === "Added to Group"){
     

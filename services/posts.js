@@ -62,13 +62,29 @@ function savePostInDB(req, res,) {
                     activity_by: req.body.OnwerId,
                     activity: "NewPostAdded",
                     post_id: result._id,
-                    notificationType: "all"
+                    notificationType: "all",
+                    activity_byName: req.body.OnwerName,
 
                 }
                 var notificationData = new NotificationModel(notify);
                 notificationData.save();
                 res.status(201).send({ message: "Data saved successfully.", result: "", })
+               
+                var groupData= await groupModel.findById(notify.group_id)
+    if(groupData.group_type==="private"){
+        var notifyData = {
 
+            group_id: notify.group_id,
+            activity_by: notify.activity_by,
+            activity: "NewPostAdded",
+            post_id: notify.post_id,
+            notificationType: "all",
+            GroupName: groupData.GroupName,
+            activity_byName:notify.activity_byName
+        }
+        
+        expoNotification.sendNotification(notifyData)
+    }
             }
 
 
