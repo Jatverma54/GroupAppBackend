@@ -560,7 +560,6 @@ exports.MakeUserAsAdmin = async (req, res) => {
 exports.getAllGroupRequest = async (req, res) => {
     try {
 
-
         var UserData = await UserModel.find({ "Requested_groups.groupid": req.body.groupId }, { username: 1, 'profile.full_name': 1, 'profile.profile_pic': 1, Requested_groups: 1 });
 
         UserData = paginate(UserData, req.query.page_size, req.query.page_number);

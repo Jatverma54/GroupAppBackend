@@ -101,8 +101,12 @@ function saveUserInDB(req, res, picLocation) {
 
 exports.getData = async (req, res) => {
     try {
+        if (req.user.profile.role === "Admin") {
         const UserData = await UserModel.find();
         res.status(200).json({ message: "Data: ", result: UserData });
+        }else{
+            res.status(500).send("User is not an Admin");
+        }
     } catch (err) {
         res.status(400).json({ message: err });
     }
@@ -121,12 +125,27 @@ exports.deleteData = async (req, res) => {
 exports.loginUser = async (req, res) => {
     try {
 
-        const user = await UserModel.findByCredentials(req.body.username, req.body.password)
-        const token = await user.generateAuthToken(req.body.ownerPushToken)
-
+        const users = await UserModel.findByCredentials(req.body.username, req.body.password)
+        const token = await users.generateAuthToken(req.body.ownerPushToken)
+       
+        var user= users.toObject();
+         delete user.admin_id;
+         delete user.isActive;
+         delete user.password;
+         delete user.created_groups;
+         delete user.joined_groups;
+         delete user.Requested_groups;
+         delete user.tokens;
+         delete user.createdAt;
+         delete user.updatedAt;
+         delete user.resetCode;
+         delete user.EnableNotification;
+         delete user.profile.role;
+         delete user.ExpopushToken;
         res.status(200).send({ user, token })
 
     } catch (err) {
+        console.log(err)
         res.status(400).send({ message: "Unable to login." });
 
     }
@@ -162,8 +181,9 @@ exports.userInformation = async (req, res) => {
            delete userData.updatedAt;
            delete userData.resetCode;
            delete userData.EnableNotification;
-           
-           
+           delete userData.profile.role;
+           delete userData.ExpopushToken;
+       
         res.status(200).json({ message: "Data: ", result: userData });
     } catch (err) {
         res.status(400).json({ message: err });
