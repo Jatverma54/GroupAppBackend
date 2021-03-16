@@ -35,7 +35,7 @@ exports.addNewPost = async (req, res, next) => {
         savePostInDB(req, res)
     } catch (err) {
         
-        res.status(500).send({ error: "Category is not present in DB" });
+        res.status(500).send({ error: err });
     }
 }
 
@@ -52,7 +52,7 @@ function savePostInDB(req, res,) {
             if (err) {
 
                 
-                res.status(400).send({ error: "Something went wrong" })
+                res.status(400).send({ error: err })
 
 
             } else {
@@ -91,7 +91,7 @@ function savePostInDB(req, res,) {
         })
 
     } catch (err) {
-                res.status(500).send({ error: "Category is not present in DB" });
+                res.status(500).send({ error: err });
     }
 }
 

@@ -10,7 +10,6 @@ const SECRET = CONSTANT.S3SECRET;
 aws.config.update({
     secretAccessKey: SECRET,
     accessKeyId: ID,
-    region: CONSTANT.region
 });
 
 var s3 = new aws.S3();
