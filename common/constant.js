@@ -7,11 +7,11 @@ var constants = {
    PostMediaBucketName:'groupappproject/PostMedia',
    CloudFrontURL:'https://d13ai2vn5o5vi1.cloudfront.net/',
   BucketURL: 'https://groupappproject.s3.ap-south-1.amazonaws.com/groupappproject/',
-   S3ID : 'AKIA4YBJ2MANXBUHM4PD',
- S3SECRET : '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',
+   S3ID : process.env.S3ID,
+ S3SECRET : process.env.S3SECRET,
  region: 'us-east-1',
-  MailId: 'support@grouphelpme.com',
-  Mailpass: 'Awesome@2394',
+  MailId: process.env.MAILID,
+  Mailpass: process.env.MAILPASS,
   EndpointUrl:'http://GroupAppbackend-dev.ap-south-1.elasticbeanstalk.com'
 }
 
