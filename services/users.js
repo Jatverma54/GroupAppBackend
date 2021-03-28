@@ -68,7 +68,9 @@ function saveUserInDB(req, res, picLocation) {
 
             var params = {
                 userID: result._id,
-                email: result.email
+                email: result.email,
+                username: result.username,
+                name:result.profile.full_name
             }
             sendEmail(params, async function (err, resp) {
                 if (err) {
