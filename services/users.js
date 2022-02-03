@@ -15,18 +15,15 @@ exports.addUser = function (req, res, next) {
             s3Config.uploadFile(req.body.profile.profilePic, req.body.username, CONSTANT.ProfilePictureBucketName)
                 .then(picLocation => saveUserInDB(req, res, picLocation))
                 .catch(function (e) {
-
                     res.status(400).send({ error: "Failed to upload profile pic" });
                 });
         } else {
             saveUserInDB(req, res, CONSTANT.PlaceholderImageUrl)
         }
-    } catch (e) {
-      
+    } catch (e) {     
         res.status(500).send({ error: "Something went wrong" });
     }
 }
-
 
 function saveUserInDB(req, res, picLocation) {
     req.body.profile.profile_pic = picLocation;
@@ -182,9 +179,9 @@ exports.userInformation = async (req, res) => {
            delete userData.createdAt;
            delete userData.updatedAt;
            delete userData.resetCode;
-           delete userData.EnableNotification;
+         //  delete userData.EnableNotification;
            delete userData.profile.role;
-           delete userData.ExpopushToken;
+          // delete userData.ExpopushToken;
        
         res.status(200).json({ message: "Data: ", result: userData });
     } catch (err) {
