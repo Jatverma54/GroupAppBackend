@@ -47,7 +47,7 @@ exports.uploadFile = (fileName, userName, BUCKET_NAME) => {
       Bucket: BUCKET_NAME,
       Key: filePath,//+imageExtension, // File name you want to save as in S3
       Body: buffer,
-      ACL: 'public-read',
+      //ACL: 'public-read',
       ContentEncoding: 'base64',
       ContentType: mime
 
