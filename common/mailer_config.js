@@ -5,8 +5,8 @@ var transporter = nodemailer.createTransport({
     host: 'smtpout.secureserver.net',
     port:'587',
     auth: {
-      user: CONSTANT.MailId,
-      pass: CONSTANT.Mailpass
+      user: 'support@grouphelpme.com',
+      pass: 'Awesome@2394'
     }
   });
 
