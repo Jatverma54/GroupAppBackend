@@ -83,9 +83,7 @@ function saveUserInDB(req, res, picLocation) {
                            
                         }
                     });
-//"Unable to register. Internal error occured."
-
-                    res.status(400).send({ error: err });
+                    res.status(400).send({ error: "Unable to register. Internal error occured." });
                 } else {
 
                     res.status(201).send({ message: "Data saved successfully.", result: "" })
