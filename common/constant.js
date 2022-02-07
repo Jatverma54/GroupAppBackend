@@ -12,7 +12,7 @@ var constants = {
  region: 'us-east-1',
   MailId: process.env.MAILID,
   Mailpass: process.env.MAILPASS,
-  EndpointUrl:'http://groupappbackend-dev.eba-b4nxh3uy.ap-south-1.elasticbeanstalk.com'
+  EndpointUrl:'http://groupappbackend-dev.ap-south-1.elasticbeanstalk.com'
 }
 
 module.exports = constants;
