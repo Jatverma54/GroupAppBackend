@@ -50,3 +50,9 @@ We welcome contributions to improve GroupApp Backend. To contribute, please foll
 For any questions or feedback, please contact us at jatinv94@gmail.com.
 
 Thank you for contributing to GroupApp! We appreciate your support in building a robust and scalable backend.
+
+**Learn more about GroupHelpMe App**:
+
+**Facebook**: https://www.facebook.com/GroupHelpMe
+
+**Linkedin**: https://www.linkedin.com/company/grouphelpme/
