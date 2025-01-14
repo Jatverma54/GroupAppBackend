@@ -44,7 +44,7 @@ We welcome contributions to improve GroupApp Backend. To contribute, please foll
 * Make your changes.
 * Commit your changes (git commit -m 'Add some feature').
 * Push to the branch (git push origin feature-branch).
-* Open a pull request.
+* Open a pull request to develop.
 
 **Contact**
 For any questions or feedback, please contact us at jatinv94@gmail.com.
