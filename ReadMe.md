@@ -36,7 +36,7 @@ eb init
 eb create
 eb deploy
 
-Contributing
+**Contributing**
 We welcome contributions to improve GroupApp Backend. To contribute, please follow these steps:
 
 * Fork the repository.
